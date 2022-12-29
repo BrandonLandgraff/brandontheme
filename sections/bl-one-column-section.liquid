@@ -1,0 +1,506 @@
+<!-- /sections/bl-one-coumn-section.liquid -->
+{{ 'tailwind.css' | asset_url | stylesheet_tag }}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+{%- liquid
+  assign section_width = section.settings.width
+  assign sectionid = section.id
+  assign text_position = section.settings.text_position
+  assign text_color = section.settings.text_color
+  assign bg_color = section.settings.bg_color
+
+  assign section_class = 'text-section ' | append: text_color
+
+  assign my_variable = section.settings.opacity | divided_by: 100.00
+-%}
+
+{%- style -%}
+  #bl-one-column-section--{{ sectionid }}{
+    {%- if bg_color != 'rgba(0,0,0,0)' and bg_color != '' -%}
+      background-color: {{ bg_color }}
+      ;
+    {%- endif -%}
+  }
+
+  #bl-one-column-section--{{ sectionid }} p {
+    color: {{ text_color }}
+    ;
+  }
+
+  {% if section.settings.bg_image != blank %}
+    #bl-one-column-section--{{ sectionid }}{
+      min-height: 100%;
+      background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', my_variable }}, {{ section.settings.overlay_color | color_modify: 'alpha', my_variable }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
+      background-size: cover;
+    }
+  {% endif %}
+
+  /* SECTION WIDTH */
+  /* .wrapper--wide {
+    max-width: 1440px;
+    margin: auto;
+    padding: 0 12px;
+  }
+
+  .wrapper--standard {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 12px;
+  }
+
+  .wrapper--narrow {
+    max-width: 1080px;
+    margin: auto;
+    padding: 0 12px;
+  } */
+
+  /* SECTION HEIGHT */
+  .height--150 {
+    height: 150px;
+  }
+
+  .height--250 {
+    height: 250px;
+  }
+
+  .height--350 {
+    height: 350px;
+  }
+
+  .height--450 {
+    height: 450px;
+  }
+
+  .height--550 {
+    height: 550px;
+  }
+
+  .height--650 {
+    height: 650px;
+  }
+
+  .bl-blocks-wrapper--{{ sectionid }} {
+    display: flex;
+    justify-content: center;
+    align-items: {{ section.settings.mb_vertical }};
+  }
+
+  .bl-blocks--{{ sectionid }} {
+    width: 100%;
+  }
+
+  @media only screen and (min-width: 768px) {
+    .bl-blocks-wrapper--{{ sectionid }} {
+      justify-content: {{ section.settings.horizontal }};
+      align-items: {{ section.settings.vertical }};
+    }
+
+    .bl-blocks--{{ sectionid }} {
+      width: {{ section.settings.wrapper }}%;
+    }
+  }
+
+  .bl-section-padding--{{ sectionid }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+      padding-left: {{ section.settings.padding_left }}px;
+      padding-right: {{ section.settings.padding_right }}px;"
+  }
+
+  @media only screen and (max-width: 768px) {
+    .bl-section-padding--{{ sectionid }} {
+      padding-top: {{ section.settings.mb_padding_top }}px;
+      padding-bottom: {{ section.settings.mb_padding_bottom }}px;
+      padding-left: {{ section.settings.mb_padding_left }}px;
+      padding-right: {{ section.settings.mb_padding_right }}px;"
+    }
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48
+  }
+{%- endstyle -%}
+
+<section
+  id="bl-one-column-section--{{ sectionid }}"
+  class="bl-section-padding--{{ sectionid }}">
+  <div class="bl-img-overlay">
+    <div class="text__wrapper">
+
+      <div style="max-width: {{ section.settings.width }}px;" class="{{ section.settings.height }} bl-blocks-wrapper--{{ sectionid }} bl-m-auto bl-px-4">
+
+        <div class="bl-blocks--{{ sectionid }}">
+          <p>OVERHAUL PLAN</p>
+          <a href="/">LINK</a>
+
+          {% for block in section.blocks %}
+            {% case block.type %}
+              {% when '@app' %}
+                {% render block %}
+
+              {% when 'heading' %}
+                {{ block.settings.text }}
+            {% endcase %}
+          {% endfor %}
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "One Column Section ■",
+    "class": "starter",
+    "settings": [
+      {
+        "type": "header",
+        "content": "DESKTOP BLOCK POSITION"
+      },
+      {
+        "type": "range",
+        "id": "wrapper",
+        "min": 20,
+        "max": 100,
+        "step": 20,
+        "unit": "%",
+        "label": "Desktop block width",
+        "default": 80
+      }, 
+      {
+        "type": "select",
+        "id": "horizontal",
+        "label": "Desktop horizontal alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "flex-start",
+            "label": "Left"
+          }, 
+          {
+            "value": "center",
+            "label": "Center"
+          }, 
+          {
+            "value": "flex-end",
+            "label": "Right"
+          }
+        ],
+        "info": "Position is automatically optimized for mobile."
+      }, 
+      {
+        "type": "select",
+        "id": "vertical",
+        "label": "Desktop vertical alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "flex-start",
+            "label": "Top"
+          }, 
+          {
+            "value": "center",
+            "label": "Center"
+          }, 
+          {
+            "value": "flex-end",
+            "label": "Bottom"
+          }
+        ],
+        "info": "Vertical position can only change if height is larger than the block."
+      }, 
+      {
+        "type": "header",
+        "content": "MOBILE BLOCK POSITION"
+      },
+      {
+        "type": "select",
+        "id": "mb_vertical",
+        "label": "Mobile vertical alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "flex-start",
+            "label": "Top"
+          }, 
+          {
+            "value": "center",
+            "label": "Center"
+          }, 
+          {
+            "value": "flex-end",
+            "label": "Bottom"
+          }
+        ],
+        "info": "Vertical position can only change if height is larger than the block."
+      }, 
+      {
+        "type": "header",
+        "content": "COLORS"
+      },
+      {
+        "type": "color",
+        "id": "bg_color",
+        "label": "Background"
+      },
+      {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text",
+        "default": "#000000"
+      },
+      {
+        "type": "header",
+        "content": "BACKGROUND IMAGE"
+      }, 
+      {
+        "type": "image_picker",
+        "id": "bg_image",
+        "label": "Background image"
+      }, 
+      {
+        "type": "header",
+        "content": "IMAGE OVERLAY"
+      }, 
+      {
+        "type": "color",
+        "id": "overlay_color",
+        "label": "Overlay color",
+        "default": "#000000"
+      },
+      {
+        "type": "range",
+        "id": "opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "label": "Overlay opacity",
+        "default": 60
+      }, 
+      {
+        "type": "header",
+        "content": "HEIGHT & WIDTH"
+      }, 
+      {
+        "type": "range",
+        "id": "width",
+        "min": 320,
+        "max": 1440,
+        "step": 20,
+        "label": "Max container width",
+        "default": 1200
+      }, 
+      {
+        "type": "select",
+        "id": "height",
+        "label": "Height",
+        "default": "height--none",
+        "options": [
+          {
+            "value": "height--none",
+            "label": "No fixed height"
+          },
+          {
+            "value": "height--150",
+            "label": "150px"
+          }, 
+          {
+            "value": "height--250",
+            "label": "250px"
+          }, 
+          {
+            "value": "height--350",
+            "label": "350px"
+          }, 
+          {
+            "value": "height--450",
+            "label": "450px"
+          }, 
+          {
+            "value": "height--550",
+            "label": "550px"
+          }, 
+          {
+            "value": "height--650",
+            "label": "650px"
+          }
+        ]
+      }, 
+      {
+        "type": "header",
+        "content": "DESKTOP PADDING"
+      }, 
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding top",
+        "default": 60
+      }, 
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding bottom",
+        "default": 60
+      }, {
+        "type": "range",
+        "id": "padding_left",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding left",
+        "default": 0
+      }, {
+        "type": "range",
+        "id": "padding_right",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding right",
+        "default": 0
+      }, {
+        "type": "header",
+        "content": "MOBILE PADDING"
+      },
+      {
+        "type": "range",
+        "id": "mb_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding top",
+        "default": 60
+      }, 
+      {
+        "type": "range",
+        "id": "mb_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding bottom",
+        "default": 60
+      }, {
+        "type": "range",
+        "id": "mb_padding_left",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding left",
+        "default": 0
+      }, {
+        "type": "range",
+        "id": "mb_padding_right",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Padding right",
+        "default": 0
+      }
+    ],
+    "blocks": [
+      {
+        "type": "@app"
+      },
+      {
+        "type": "subheading",
+        "name": "Subheading",
+        "settings": [
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Subheading</p>"
+          }
+        ]
+      }, {
+        "type": "heading",
+        "name": "Heading",
+        "settings": [
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Our Story</p>",
+            "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
+          }
+        ]
+      }, {
+        "type": "text",
+        "name": "Text",
+        "settings": [
+          {
+            "type": "richtext",
+            "id": "text",
+            "label": "Text",
+            "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+          }
+        ]
+      }, {
+        "type": "button",
+        "name": "Button",
+        "limit": 2,
+        "settings": [
+          {
+            "type": "text",
+            "id": "btn_text",
+            "label": "Text",
+            "default": "Read More"
+          }, {
+            "type": "url",
+            "id": "btn_link",
+            "label": "URL"
+          }, {
+            "type": "select",
+            "id": "btn_style",
+            "label": "Style",
+            "default": "btn--primary btn--small",
+            "options": [
+              {
+                "label": "Text",
+                "value": "btn--text"
+              },
+              {
+                "label": "Small button",
+                "value": "btn--primary btn--small"
+              },
+              {
+                "label": "Large button",
+                "value": "btn--primary"
+              },
+              {
+                "label": "Small outline button",
+                "value": "btn--secondary btn--small"
+              }, {
+                "label": "Large outline button",
+                "value": "btn--secondary"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "One Column Section ■",
+        "category": "Text",
+        "blocks": []
+      }
+    ]
+  }
+{% endschema %}

@@ -1,3 +1,20 @@
+.bl-relative {
+  position: relative
+}
+
+.bl-m-auto {
+  margin: auto
+}
+
+.bl-block {
+  display: block
+}
+
+.bl-px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem
+}
+
 .bl-opacity-25 {
   opacity: 0.25
 }
