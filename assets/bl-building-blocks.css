@@ -1,0 +1,36 @@
+  
+/* ICONS */
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48
+  }
+
+/* BUTTON HOVER */
+.bl-btn--link {
+    text-decoration: underline;
+  }
+
+  .bl-btn {
+    display: inline-block;
+    text-decoration: none;
+    transition-duration: 0.4s;
+  }
+
+  .bl-btn:hover {
+    opacity: 0.7;
+  }
+
+  /* SPACE BLOCK */
+  .bl-dt-space {
+    display: block !important;
+  }
+  .bl-mb-space {
+    display: none !important;
+  }
+  @media only screen and (max-width: 768px) {
+    .bl-dt-space {
+      display: none !important;
+    }
+    .bl-mb-space {
+      display: block !important;
+    }
+  }

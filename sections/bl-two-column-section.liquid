@@ -11,7 +11,7 @@
 
   assign section_class = 'text-section ' | append: text_color
 
-  assign my_variable = section.settings.opacity | divided_by: 100.00
+  assign bg_overlay = section.settings.opacity | divided_by: 100.00
 -%}
 
 {%- style -%}
@@ -22,85 +22,65 @@
     {%- endif -%}
   }
 
-  #bl-two-column-section--{{ sectionid }} p {
-    color: {{ text_color }}
-    ;
-  }
-
   {% if section.settings.bg_image != blank %}
     #bl-two-column-section--{{ sectionid }}{
         min-height: 100%;
-        background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', my_variable }}, {{ section.settings.overlay_color | color_modify: 'alpha', my_variable }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
+        background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
         background-size: cover;
     }
   {% endif %}
 
-  /* SECTION WIDTH */
-  /* .wrapper--wide {
-    max-width: 1440px;
-    margin: auto;
-    padding: 0 12px;
-  }
-
-  .wrapper--standard {
-    max-width: 1200px;
-    margin: auto;
-    padding: 0 12px;
-  }
-
-  .wrapper--narrow {
-    max-width: 1080px;
-    margin: auto;
-    padding: 0 12px;
-  } */
-
-  /* SECTION HEIGHT */
-  .height--150 {
-    height: 150px;
-  }
-
-  .height--250 {
-    height: 250px;
-  }
-
-  .height--350 {
-    height: 350px;
-  }
-
-  .height--450 {
-    height: 450px;
-  }
-
-  .height--550 {
-    height: 550px;
-  }
-
-  .height--650 {
-    height: 650px;
-  }
-
-  .bl-blocks-wrapper--{{ sectionid }} {
-    display: flex;
-    justify-content: center;
-    align-items: {{ section.settings.mb_vertical }};
-  }
-
   .bl-blocks--{{ sectionid }} {
-    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: {{ section.settings.gap }}px;
+    justify-content: center;
   }
 
   @media only screen and (min-width: 768px) {
+    /* SECTION HEIGHT */
+    .height--150 {
+      height: 150px;
+    }
+
+    .height--250 {
+      height: 250px;
+    }
+
+    .height--350 {
+      height: 350px;
+    }
+
+    .height--450 {
+      height: 450px;
+    }
+
+    .height--550 {
+      height: 550px;
+    }
+
+    .height--650 {
+      height: 650px;
+    }
+
+    .bl-blocks-wrapper--{{ sectionid }} {
+      display: flex;
+      justify-content: center;
+      align-items: {{ section.settings.mb_vertical }};
+    }
+
+    .bl-blocks--{{ sectionid }} {
+      width: 100%;
+    }
+
     .bl-blocks-wrapper--{{ sectionid }} {
       justify-content: {{ section.settings.horizontal }};
       align-items: {{ section.settings.vertical }};
     }
 
-    .bl-blocks--{{ sectionid }} {
-      display: grid;
+    .bl-blocks--{{ sectionid }} {   
       grid-template-columns: {{ section.settings.column_ratios }};
-      justify-content: center;
       align-items: {{ section.settings.alignment }};
-      gap: {{ section.settings.gap }}px;
       width: {{ section.settings.wrapper }}%;
     }
   }
@@ -121,9 +101,49 @@
     }
   }
 
-  .material-symbols-outlined {
+  /* ICONS */
+.material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48
   }
+
+/* BUTTON HOVER */
+.bl-btn--link {
+    text-decoration: underline;
+  }
+
+  .bl-btn {
+    display: inline-block;
+    text-decoration: none;
+    transition-duration: 0.4s;
+  }
+
+  .bl-btn:hover {
+    opacity: 0.7;
+  }
+
+  /* SPACE BLOCK */
+  .bl-dt-space {
+    display: block !important;
+  }
+  .bl-mb-space {
+    display: none !important;
+  }
+  @media only screen and (max-width: 768px) {
+    .bl-dt-space {
+      display: none !important;
+    }
+    .bl-mb-space {
+      display: block !important;
+    }
+  }
+
+  /* IMAGE */
+  @media only screen and (min-width: 768px) {
+    .bl--image-wrapper--{{ sectionid }} {
+      padding: 0px !important;
+    }
+  }
+
 {%- endstyle -%}
 
 <section
@@ -142,10 +162,53 @@
                     {% render block %}
                 </div>
 
-              {% when 'heading' %}
-                <div class="bl--block-wrapper--{{ sectionid }}">
-                    {{ block.settings.text }}
+              {% when 'text' %}
+                {%- liquid
+                  assign column_image_overlay = block.settings.opacity | divided_by: 100.00
+                -%}
+                <div class="bl--block-wrapper--{{ sectionid }}" style="padding: {{ block.settings.column_padding }}px; text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: cover; {% endif %}">
+                  {% if block.settings.subheading != blank %}
+                    <h5 class="bl-subheading" style="color: {{ block.settings.subheading_color }}; letter-spacing: {{ block.settings.subheading_letter }}px; margin-bottom: {{ block.settings.subheading_space }}px;">{{ block.settings.subheading }}</h4>
+                  {% endif %}
+
+                  {% if block.settings.heading != blank %}
+                    <h2 class="bl-heading" style="color: {{ block.settings.heading_color }}; margin-bottom: {{ block.settings.heading_space }}px;">{{ block.settings.heading }}</h2>
+                  {% endif %}
+
+                  {% if block.settings.description != blank %}
+                    <div class="bl-description" style="color: {{ block.settings.description_color }}; margin-bottom: {{ block.settings.description_space }}px;">{{ block.settings.description }}</div>
+                  {% endif %}
+
+                  {% if block.settings.btn_text != blank %}
+                    <a class="bl-btn" href="{{ block.settings.btn_link }}" style="color: {{ block.settings.btn_color }}; background-color: {{ block.settings.btn_bg_color }}; padding: 6px {{ block.settings.btn_padding }}px; border-style: solid; border-width: {{ block.settings.btn_border_width }}px; border-radius: {{ block.settings.btn_border_radius }}px; border-color: {{ block.settings.btn_border_color }}; margin-bottom: {{ block.settings.btn_space }}px;">{{ block.settings.btn_text }}</a>
+                  {% endif %}
+
+                  {% if block.settings.under_text != blank %}
+                    <div class="bl-under-text" style="color: {{ block.settings.under_text_color }}; margin-bottom: {{ block.settings.under_text_space }}px;">{{ block.settings.under_text }}</div>
+                  {% endif %}
                 </div>
+
+              {% when 'space' %}
+                <div
+                class="bl-dt-space"
+                style="
+                padding-top: {{ block.settings.dt_vertical_space }}px;
+                padding-left: {{ block.settings.dt_horizontal_space }}px;
+                "
+                ></div>
+                <div
+                class="bl-mb-space"
+                style="
+                padding-top: {{ block.settings.mb_vertical_space }}px;
+                padding-left: {{ block.settings.mb_horizontal_space }}px;
+                "
+                ></div>
+
+              {% when 'image' %}
+                {%- liquid
+                assign image_overlay = block.settings.opacity | divided_by: 100.00
+                -%}
+                <div class="bl--image-wrapper--{{ sectionid }}" style="width: 100%; height: 100%; padding-bottom: {{ block.settings.mobile_height }}px; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: cover; {% endif %} border-radius: {{ block.settings.border_radius }}px;">
 
             {% endcase %}
           {% endfor %}
@@ -163,12 +226,52 @@
     "settings": [
       {
         "type": "header",
+        "content": "SECTION HEIGHT"
+      },
+      {
+        "type": "select",
+        "id": "height",
+        "label": "Section height",
+        "default": "height--none",
+        "options": [
+          {
+            "value": "height--none",
+            "label": "No fixed height"
+          },
+          {
+            "value": "height--150",
+            "label": "150px"
+          }, 
+          {
+            "value": "height--250",
+            "label": "250px"
+          }, 
+          {
+            "value": "height--350",
+            "label": "350px"
+          }, 
+          {
+            "value": "height--450",
+            "label": "450px"
+          }, 
+          {
+            "value": "height--550",
+            "label": "550px"
+          }, 
+          {
+            "value": "height--650",
+            "label": "650px"
+          }
+        ]
+      }, 
+      {
+        "type": "header",
         "content": "COLUMNS"
       },
       {
         "type": "select",
         "id": "column_ratios",
-        "label": "Column ratios",
+        "label": "Column width ratio",
         "default": "50% 50%",
         "options": [
           {
@@ -213,7 +316,7 @@
       {
         "type": "select",
         "id": "alignment",
-        "label": "Column content alignment",
+        "label": "Column alignment",
         "default": "center",
         "options": [
           {
@@ -229,7 +332,7 @@
             "label": "Bottom"
           }
         ],
-        "info": "Aligns content in columns."
+        "info": "Aligns text & content inside the columns."
       }, 
       {
         "type": "range",
@@ -237,12 +340,12 @@
         "min": 0,
         "max": 144,
         "step": 12,
-        "label": "Column gap",
+        "label": "Space between columns",
         "default": 12
       }, 
       {
         "type": "header",
-        "content": "DESKTOP BLOCK POSITION"
+        "content": "DESKTOP COLUMN CONTAINER"
       },
       {
         "type": "range",
@@ -251,13 +354,22 @@
         "max": 100,
         "step": 20,
         "unit": "%",
-        "label": "Desktop block width",
+        "label": "Container width",
         "default": 80
+      }, 
+      {
+        "type": "range",
+        "id": "width",
+        "min": 320,
+        "max": 1440,
+        "step": 20,
+        "label": "Max container width",
+        "default": 1200
       }, 
       {
         "type": "select",
         "id": "horizontal",
-        "label": "Desktop horizontal alignment",
+        "label": "Container horizontal alignment",
         "default": "center",
         "options": [
           {
@@ -278,7 +390,7 @@
       {
         "type": "select",
         "id": "vertical",
-        "label": "Desktop vertical alignment",
+        "label": "Container vertical alignment",
         "default": "center",
         "options": [
           {
@@ -298,12 +410,12 @@
       }, 
       {
         "type": "header",
-        "content": "MOBILE BLOCK POSITION"
+        "content": "MOBILE COLUMN CONTAINER"
       },
       {
         "type": "select",
         "id": "mb_vertical",
-        "label": "Mobile vertical alignment",
+        "label": "Container vertical alignment",
         "default": "center",
         "options": [
           {
@@ -323,23 +435,13 @@
       }, 
       {
         "type": "header",
-        "content": "COLORS"
-      },
+        "content": "BACKGROUND"
+      }, 
       {
         "type": "color",
         "id": "bg_color",
         "label": "Background"
       },
-      {
-        "type": "color",
-        "id": "text_color",
-        "label": "Text",
-        "default": "#000000"
-      },
-      {
-        "type": "header",
-        "content": "BACKGROUND IMAGE"
-      }, 
       {
         "type": "image_picker",
         "id": "bg_image",
@@ -366,56 +468,7 @@
       }, 
       {
         "type": "header",
-        "content": "HEIGHT & WIDTH"
-      }, 
-      {
-        "type": "range",
-        "id": "width",
-        "min": 320,
-        "max": 1440,
-        "step": 20,
-        "label": "Max container width",
-        "default": 1200
-      }, 
-      {
-        "type": "select",
-        "id": "height",
-        "label": "Height",
-        "default": "height--none",
-        "options": [
-          {
-            "value": "height--none",
-            "label": "No fixed height"
-          },
-          {
-            "value": "height--150",
-            "label": "150px"
-          }, 
-          {
-            "value": "height--250",
-            "label": "250px"
-          }, 
-          {
-            "value": "height--350",
-            "label": "350px"
-          }, 
-          {
-            "value": "height--450",
-            "label": "450px"
-          }, 
-          {
-            "value": "height--550",
-            "label": "550px"
-          }, 
-          {
-            "value": "height--650",
-            "label": "650px"
-          }
-        ]
-      }, 
-      {
-        "type": "header",
-        "content": "DESKTOP PADDING"
+        "content": "DESKTOP SECTION PADDING"
       }, 
       {
         "type": "range",
@@ -444,7 +497,7 @@
         "step": 1,
         "unit": "px",
         "label": "Padding left",
-        "default": 0
+        "default": 24
       }, {
         "type": "range",
         "id": "padding_right",
@@ -453,10 +506,11 @@
         "step": 1,
         "unit": "px",
         "label": "Padding right",
-        "default": 0
-      }, {
+        "default": 24
+      }, 
+      {
         "type": "header",
-        "content": "MOBILE PADDING"
+        "content": "MOBILE SECTION PADDING"
       },
       {
         "type": "range",
@@ -485,7 +539,7 @@
         "step": 1,
         "unit": "px",
         "label": "Padding left",
-        "default": 0
+        "default": 12
       }, {
         "type": "range",
         "id": "mb_padding_right",
@@ -494,52 +548,176 @@
         "step": 1,
         "unit": "px",
         "label": "Padding right",
-        "default": 0
+        "default": 12
       }
     ],
+    "max_blocks": 2,
     "blocks": [
       {
         "type": "@app"
       },
       {
-        "type": "subheading",
-        "name": "Subheading",
-        "settings": [
-          {
-            "type": "richtext",
-            "id": "text",
-            "label": "Text",
-            "default": "<p>Subheading</p>"
-          }
-        ]
-      }, {
-        "type": "heading",
-        "name": "Heading",
-        "settings": [
-          {
-            "type": "richtext",
-            "id": "text",
-            "label": "Text",
-            "default": "<p>Our Story</p>",
-            "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
-          }
-        ]
-      }, {
         "type": "text",
         "name": "Text",
         "settings": [
           {
+            "type": "header",
+            "content": "POSITIONING"
+          },
+          {
+            "type": "select",
+            "id": "text_align",
+            "label": "Text alignment",
+            "default": "center",
+            "options": [
+              {
+                "label": "Left",
+                "value": "left"
+              },
+              {
+                "label": "Center",
+                "value": "center"
+              },
+              {
+                "label": "Right",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "range",
+            "id": "column_padding",
+            "min": 0,
+            "max": 96,
+            "step": 2,
+            "label": "Padding",
+            "default": 24
+          }, 
+          {
+            "type": "range",
+            "id": "border_width",
+            "min": 0,
+            "max": 10,
+            "step": 1,
+            "unit": "px",
+            "label": "Border width",
+            "default": 0
+          }, 
+          {
+            "type": "range",
+            "id": "border_radius",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "px",
+            "label": "Border radius",
+            "default": 5
+          }, 
+          {
+            "type": "color",
+            "id": "border_color",
+            "label": "Border color",
+            "default": "#000000"
+          },
+          {
+            "type": "color",
+            "id": "bg_color",
+            "label": "Background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "SUBHEADING"
+          },
+          {
             "type": "richtext",
-            "id": "text",
+            "id": "subheading",
+            "label": "Text",
+            "default": "<p>Subheading</p>"
+          },
+          {
+            "type": "color",
+            "id": "subheading_color",
+            "label": "Font color",
+            "default": "#000000"
+          },
+          {
+            "type": "range",
+            "id": "subheading_letter",
+            "min": 0,
+            "max": 24,
+            "step": 1,
+            "label": "Letter spacing",
+            "default": 1
+          }, 
+          {
+            "type": "range",
+            "id": "subheading_space",
+            "min": 0,
+            "max": 200,
+            "step": 2,
+            "label": "Spacing bottom",
+            "default": 12
+          }, 
+          {
+            "type": "header",
+            "content": "HEADING"
+          },
+          {
+            "type": "richtext",
+            "id": "heading",
+            "label": "Text",
+            "default": "<p>Text section</p>",
+            "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
+          },
+          {
+            "type": "color",
+            "id": "heading_color",
+            "label": "Font color",
+            "default": "#000000"
+          },
+          {
+            "type": "range",
+            "id": "heading_space",
+            "min": 0,
+            "max": 200,
+            "step": 2,
+            "label": "Spacing bottom",
+            "default": 12
+          },
+          {
+            "type": "header",
+            "content": "DESCRIPTION"
+          },
+          {
+            "type": "richtext",
+            "id": "description",
             "label": "Text",
             "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
-          }
-        ]
-      }, {
-        "type": "button",
-        "name": "Button",
-        "limit": 2,
-        "settings": [
+          },
+          {
+            "type": "color",
+            "id": "description_color",
+            "label": "Font color",
+            "default": "#000000"
+          },
+          {
+            "type": "range",
+            "id": "description_space",
+            "min": 0,
+            "max": 200,
+            "step": 2,
+            "label": "Spacing bottom",
+            "default": 12
+          },
+          {
+            "type": "header",
+            "content": "BUTTON"
+          },
           {
             "type": "text",
             "id": "btn_text",
@@ -549,32 +727,177 @@
             "type": "url",
             "id": "btn_link",
             "label": "URL"
-          }, {
-            "type": "select",
-            "id": "btn_style",
-            "label": "Style",
-            "default": "btn--primary btn--small",
-            "options": [
-              {
-                "label": "Text",
-                "value": "btn--text"
-              },
-              {
-                "label": "Small button",
-                "value": "btn--primary btn--small"
-              },
-              {
-                "label": "Large button",
-                "value": "btn--primary"
-              },
-              {
-                "label": "Small outline button",
-                "value": "btn--secondary btn--small"
-              }, {
-                "label": "Large outline button",
-                "value": "btn--secondary"
-              }
-            ]
+          }, 
+          {
+            "type": "color",
+            "id": "btn_color",
+            "label": "Font color",
+            "default": "#FAFAFA"
+          },
+          {
+            "type": "color",
+            "id": "btn_bg_color",
+            "label": "Background color",
+            "default": "#008060"
+          },
+          {
+            "type": "range",
+            "id": "btn_padding",
+            "min": 0,
+            "max": 48,
+            "step": 2,
+            "label": "Left/right padding",
+            "default": 24
+          }, 
+          {
+            "type": "range",
+            "id": "btn_border_width",
+            "min": 0,
+            "max": 10,
+            "step": 1,
+            "unit": "px",
+            "label": "Border width",
+            "default": 0
+          }, 
+          {
+            "type": "range",
+            "id": "btn_border_radius",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "px",
+            "label": "Border radius",
+            "default": 5
+          }, 
+          {
+            "type": "color",
+            "id": "btn_border_color",
+            "label": "Border color",
+            "default": "#000000"
+          },
+          {
+            "type": "range",
+            "id": "btn_space",
+            "min": 0,
+            "max": 200,
+            "step": 2,
+            "label": "Spacing bottom",
+            "default": 12
+          }, 
+          {
+            "type": "header",
+            "content": "UNDER BUTTON TEXT"
+          },
+          {
+            "type": "richtext",
+            "id": "under_text",
+            "label": "Under button text",
+            "default": "<p>Quick objection buster goes here.</p>"
+          },
+          {
+            "type": "color",
+            "id": "under_text_color",
+            "label": "Font color",
+            "default": "#A4A4A4"
+          }, 
+          {
+            "type": "range",
+            "id": "under_text_space",
+            "min": 0,
+            "max": 200,
+            "step": 2,
+            "label": "Spacing bottom",
+            "default": 12
+          },
+          {
+            "type": "header",
+            "content": "BACKGROUND IMAGE"
+          }, 
+          {
+            "type": "image_picker",
+            "id": "bg_image",
+            "label": "Background image"
+          }, 
+          {
+            "type": "header",
+            "content": "IMAGE OVERLAY"
+          }, 
+          {
+            "type": "color",
+            "id": "overlay_color",
+            "label": "Overlay color",
+            "default": "#000000"
+          },
+          {
+            "type": "range",
+            "id": "opacity",
+            "min": 0,
+            "max": 100,
+            "step": 5,
+            "label": "Overlay opacity",
+            "default": 60
+          }
+        ]
+      },
+      {
+        "type": "image",
+        "name": "Image",
+        "settings": [
+          {
+            "type": "header",
+            "content": "IMAGE"
+          }, 
+          {
+            "type": "image_picker",
+            "id": "bg_image",
+            "label": "Background image"
+          }, 
+          {
+            "type": "header",
+            "content": "IMAGE OVERLAY"
+          }, 
+          {
+            "type": "color",
+            "id": "overlay_color",
+            "label": "Overlay color",
+            "default": "#000000"
+          },
+          {
+            "type": "range",
+            "id": "opacity",
+            "min": 0,
+            "max": 100,
+            "step": 5,
+            "label": "Overlay opacity",
+            "default": 0
+          },
+          {
+            "type": "header",
+            "content": "BORDER STYLE"
+          }, 
+          {
+            "type": "range",
+            "id": "border_radius",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "unit": "px",
+            "label": "Border radius",
+            "default": 5
+          }, 
+          {
+            "type": "header",
+            "content": "MOBILE HEIGHT"
+          },
+          {
+            "type": "range",
+            "id": "mobile_height",
+            "min": 0,
+            "max": 600,
+            "step": 10,
+            "unit": "px",
+            "label": "Image height",
+            "default": 350
           }
         ]
       }
@@ -583,7 +906,14 @@
       {
         "name": "Two Column Section ■",
         "category": "Text",
-        "blocks": []
+        "blocks": [
+          {
+            "type": "text"
+          },
+          {
+            "type": "text"
+          }
+        ]
       }
     ]
   }
