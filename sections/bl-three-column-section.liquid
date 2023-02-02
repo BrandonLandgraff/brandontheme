@@ -1,4 +1,4 @@
-<!-- /sections/bl-one-coumn-section.liquid -->
+<!-- /sections/bl-two-coumn-section.liquid -->
 {{ 'tailwind.css' | asset_url | stylesheet_tag }}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
@@ -10,18 +10,18 @@
 -%}
 
 {%- style -%}
-  #bl-one-column-section--{{ sectionid }}{
+  #bl-two-column-section--{{ sectionid }}{
     {%- if bg_color != 'rgba(0,0,0,0)' and bg_color != '' -%}
       background-color: {{ bg_color }};
     {%- endif -%}
   }
 
   {% if section.settings.bg_image != blank %}
-    #bl-one-column-section--{{ sectionid }}{
-      min-height: 100%;
-      background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
-      background-size: {{ section.settings.bg_image_size }};
-      background-repeat: no-repeat;
+    #bl-two-column-section--{{ sectionid }}{
+        min-height: 100%;
+        background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
+        background-size: {{ section.settings.bg_image_size }};
+        background-repeat: no-repeat;
     }
   {% endif %}
 
@@ -49,6 +49,13 @@
     }
 
     .bl-blocks--{{ sectionid }} {   
+      grid-template-columns: 
+        {% if section.settings.first_column == blank %} {{ section.settings.column_ratios }}{% endif %}
+        {% if section.settings.first_column != blank %} {{ section.settings.first_column }}{% endif %}
+        {% if section.settings.second_column != blank %} {{ section.settings.second_column }}{% endif %}
+        {% if section.settings.third_column != blank %} {{ section.settings.third_column }}{% endif %}
+        {% if section.settings.fourth_column != blank %} {{ section.settings.fourth_column }}{% endif %}
+        ;
       align-items: {{ section.settings.alignment }};
       width: {{ section.settings.wrapper }}%;
     }
@@ -272,13 +279,14 @@
       display: none !important;
     }
   }
+
 {%- endstyle -%}
 
 <section
-  id="bl-one-column-section--{{ sectionid }}"
+  id="bl-two-column-section--{{ sectionid }}"
   class="bl-section-padding--{{ sectionid }} {{ section.settings.display_options }}">
   <div class="bl-img-overlay">
-    <div style="max-width: {{ section.settings.width }}px;" class="bl-blocks-wrapper--{{ sectionid }} {{ section.settings.dt_height }} {{ section.settings.mb_height }} bl-m-auto bl-px-4">
+      <div style="max-width: {{ section.settings.width }}px;" class="bl-blocks-wrapper--{{ sectionid }} {{ section.settings.dt_height }} {{ section.settings.mb_height }} bl-m-auto bl-px-4">
         <div class="bl-blocks--{{ sectionid }}">
 
           {% for block in section.blocks %}
@@ -1359,30 +1367,122 @@
 </section>
 
 <script>
-  var acc = document.getElementsByClassName("bl-accordion");
-  var i;
-  
-  for (i = 0; i < acc.length; i++) {
-    acc[i].addEventListener("click", function() {
-      this.classList.toggle("active");
-      var panel = this.nextElementSibling;
-      if (panel.style.maxHeight) {
-        panel.style.maxHeight = null;
-      } else {
-        panel.style.maxHeight = panel.scrollHeight + "px";
-      } 
-    });
-  }
-  </script>
+var acc = document.getElementsByClassName("bl-accordion");
+var i;
 
-  {% schema %}
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    } 
+  });
+}
+</script>
+
+{% schema %}
   {
-    "name": "One Column Section ◰",
+    "name": "Flexible Section ◰",
     "class": "starter",
     "settings": [
       {
         "type": "header",
-        "content": "DESKTOP CONTAINER"
+        "content": "COLUMN RATIOS"
+      },
+      {
+        "type": "select",
+        "id": "column_ratios",
+        "label": "Column width ratio",
+        "info": "Change the distribution of your columns on desktop.",
+        "default": "1fr",
+        "options": [
+          {
+            "value": "1fr",
+            "label": "One Column"
+          }, 
+          {
+            "value": "1fr 1fr",
+            "label": "Two Columns"
+          }, 
+          {
+            "value": "1fr 1fr 1fr",
+            "label": "Three Columns"
+          }, 
+          {
+            "value": "1fr 1fr 1fr 1fr",
+            "label": "Four Columns"
+          }
+        ]
+      }, 
+      {
+        "type": "header",
+        "content": "CUSTOM COLUMN RATIOS",
+        "info": "Overwrite the above settings and add your own custom column ratios."
+      },
+      {
+        "type": "text",
+        "id": "first_column",
+        "label": "First column",
+        "info": "E.g. 100%, 200px, 1fr"
+      },
+      {
+        "type": "text",
+        "id": "second_column",
+        "label": "Second column",
+        "info": "E.g. 100%, 200px, 1fr"
+      },
+      {
+        "type": "text",
+        "id": "third_column",
+        "label": "Third column",
+        "info": "E.g. 100%, 200px, 1fr"
+      },
+      {
+        "type": "text",
+        "id": "fourth_column",
+        "label": "Fourth column",
+        "info": "E.g. 100%, 200px, 1fr"
+      },
+      {
+        "type": "header",
+        "content": "COLUMN SETTINGS"
+      },
+      {
+        "type": "select",
+        "id": "alignment",
+        "label": "Column content alignment",
+        "info": "Only available on desktop.",
+        "default": "center",
+        "options": [
+          {
+            "value": "start",
+            "label": "Top"
+          }, 
+          {
+            "value": "center",
+            "label": "Center"
+          }, 
+          {
+            "value": "end",
+            "label": "Bottom"
+          }
+        ]
+      }, 
+      {
+        "type": "range",
+        "id": "gap",
+        "min": 0,
+        "max": 144,
+        "step": 12,
+        "label": "Space between columns",
+        "default": 12
+      }, 
+      {
+        "type": "header",
+        "content": "DESKTOP COLUMN CONTAINER"
       },
       {
         "type": "range",
@@ -1402,15 +1502,6 @@
         "step": 20,
         "label": "Max container width",
         "default": 1200
-      }, 
-      {
-        "type": "range",
-        "id": "gap",
-        "min": 0,
-        "max": 144,
-        "step": 12,
-        "label": "Space between blocks",
-        "default": 12
       }, 
       {
         "type": "select",
@@ -1452,7 +1543,7 @@
             "label": "Bottom"
           }
         ],
-        "info": "Vertical position can only change if height is larger than the block."
+        "info": "Vertical position can only change if section height is larger than container height."
       }, 
       {
         "type": "header",
@@ -1477,7 +1568,7 @@
             "label": "Bottom"
           }
         ],
-        "info": "Vertical position can only change if height is larger than the block."
+        "info": "Vertical position can only change if section height is larger than container height."
       }, 
       {
         "type": "header",
@@ -1730,6 +1821,42 @@
       },
       {
         "type": "header",
+        "content": "MOBILE COLUMN ORDER"
+      },
+      {
+        "type": "select",
+        "id": "first_order",
+        "label": "First column order",
+        "default": "1",
+        "options": [
+          {
+            "value": "1",
+            "label": "Show first"
+          }, 
+          {
+            "value": "2",
+            "label": "Show second"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "second_order",
+        "label": "Second column order",
+        "default": "2",
+        "options": [
+          {
+            "value": "1",
+            "label": "Show first"
+          }, 
+          {
+            "value": "2",
+            "label": "Show second"
+          }
+        ]
+      },
+      {
+        "type": "header",
         "content": "DISPLAY SETTINGS"
       }, 
       {
@@ -1753,7 +1880,7 @@
         ]
       }
     ],
-    "max_blocks": 2,
+    "max_blocks": 4,
     "blocks": [
       {
         "type": "@app"
@@ -7047,9 +7174,12 @@
     ],
     "presets": [
       {
-        "name": "One Column Section ◰",
+        "name": "Flexible Section ◰",
         "category": "Text",
         "blocks": [
+          {
+            "type": "text"
+          },
           {
             "type": "text"
           }

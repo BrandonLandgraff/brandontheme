@@ -1,5 +1,6 @@
 <!-- /sections/bl-one-coumn-section.liquid -->
-{{ 'tailwind.css' | asset_url | stylesheet_tag }}
+{{ 'bl-styling.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'bl-base.js' | asset_url }}" defer="defer"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
 {%- liquid
@@ -10,18 +11,18 @@
 -%}
 
 {%- style -%}
-  #bl-one-column-section--{{ sectionid }}{
+  #bl-two-column-section--{{ sectionid }}{
     {%- if bg_color != 'rgba(0,0,0,0)' and bg_color != '' -%}
       background-color: {{ bg_color }};
     {%- endif -%}
   }
 
   {% if section.settings.bg_image != blank %}
-    #bl-one-column-section--{{ sectionid }}{
-      min-height: 100%;
-      background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
-      background-size: {{ section.settings.bg_image_size }};
-      background-repeat: no-repeat;
+    #bl-two-column-section--{{ sectionid }}{
+        min-height: 100%;
+        background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
+        background-size: {{ section.settings.bg_image_size }};
+        background-repeat: no-repeat;
     }
   {% endif %}
 
@@ -49,6 +50,13 @@
     }
 
     .bl-blocks--{{ sectionid }} {   
+      grid-template-columns: 
+        {% if section.settings.first_column == blank %} {{ section.settings.column_ratios }}{% endif %}
+        {% if section.settings.first_column != blank %} {{ section.settings.first_column }}{% endif %}
+        {% if section.settings.second_column != blank %} {{ section.settings.second_column }}{% endif %}
+        {% if section.settings.third_column != blank %} {{ section.settings.third_column }}{% endif %}
+        {% if section.settings.fourth_column != blank %} {{ section.settings.fourth_column }}{% endif %}
+        ;
       align-items: {{ section.settings.alignment }};
       width: {{ section.settings.wrapper }}%;
     }
@@ -74,7 +82,6 @@
     margin: 0px !important;
   }
 
-  /* ----- BUILDING BLOCKS CSS ----- */
   /* COLUMN ORDER */
   @media only screen and ( max-width: 768px ) {  
     .bl-blocks--{{ sectionid }} .bl--block:nth-child(2) { 
@@ -83,9 +90,16 @@
     .bl-blocks--{{ sectionid }} .bl--block:nth-child(4) { 
       order: {{ section.settings.second_order }}; 
     }
+    .bl-blocks--{{ sectionid }} .bl--block:nth-child(6) { 
+      order: {{ section.settings.third_order }}; 
+    }
+    .bl-blocks--{{ sectionid }} .bl--block:nth-child(8) { 
+      order: {{ section.settings.fourth_order }}; 
+    }
   }
 
-  /* DESKTOP SECTION HEIGHT */
+  /* ----- BUILDING BLOCKS CSS ----- */
+/* DESKTOP SECTION HEIGHT */
 @media only screen and (min-width: 768px){
   .height--150 {
     height: 150px;
@@ -207,14 +221,17 @@
 
   /* BUTTON STYLES */
   .bl-btn--full-w-tall {
+    text-align: center !important;
     padding: 12px 12px;
     width: 100%;
   }
   .bl-btn--full-w-medium {
+    text-align: center !important;
     padding: 6px 6px;
     width: 100%;
   }
   .bl-btn--full-w-short {
+    text-align: center !important;
     padding: 0px 4px;
     width: 100%;
   }
@@ -272,13 +289,14 @@
       display: none !important;
     }
   }
+
 {%- endstyle -%}
 
 <section
-  id="bl-one-column-section--{{ sectionid }}"
+  id="bl-two-column-section--{{ sectionid }}"
   class="bl-section-padding--{{ sectionid }} {{ section.settings.display_options }}">
   <div class="bl-img-overlay">
-    <div style="max-width: {{ section.settings.width }}px;" class="bl-blocks-wrapper--{{ sectionid }} {{ section.settings.dt_height }} {{ section.settings.mb_height }} bl-m-auto bl-px-4">
+      <div style="max-width: {{ section.settings.width }}px;" class="bl-blocks-wrapper--{{ sectionid }} {{ section.settings.dt_height }} {{ section.settings.mb_height }} bl-m-auto bl-px-4">
         <div class="bl-blocks--{{ sectionid }}">
 
           {% for block in section.blocks %}
@@ -1358,31 +1376,101 @@
   </div>
 </section>
 
-<script>
-  var acc = document.getElementsByClassName("bl-accordion");
-  var i;
-  
-  for (i = 0; i < acc.length; i++) {
-    acc[i].addEventListener("click", function() {
-      this.classList.toggle("active");
-      var panel = this.nextElementSibling;
-      if (panel.style.maxHeight) {
-        panel.style.maxHeight = null;
-      } else {
-        panel.style.maxHeight = panel.scrollHeight + "px";
-      } 
-    });
-  }
-  </script>
-
-  {% schema %}
+{% schema %}
   {
-    "name": "One Column Section ◰",
+    "name": "Flexi Section 🙌",
     "class": "starter",
     "settings": [
+        {
+            "type": "header",
+            "content": "DISPLAY SETTINGS"
+        }, 
+        {
+            "type": "select",
+            "id": "display_options",
+            "label": "Display option",
+            "default": "bl-hide-none",
+            "options": [
+                {
+                "value": "bl-hide-none",
+                "label": "Display everywhere"
+                }, 
+                {
+                "value": "bl-hide-desktop",
+                "label": "Hide on desktop"
+                }, 
+                {
+                "value": "bl-hide-mobile",
+                "label": "Hide on mobile"
+                }
+            ]
+        },
       {
         "type": "header",
-        "content": "DESKTOP CONTAINER"
+        "content": "COLUMN RATIOS"
+      },
+      {
+        "type": "select",
+        "id": "column_ratios",
+        "label": "Column width ratio",
+        "info": "Change the distribution of your columns on desktop.",
+        "default": "1fr 1fr",
+        "options": [
+          {
+            "value": "1fr",
+            "label": "One Column"
+          }, 
+          {
+            "value": "1fr 1fr",
+            "label": "Two Columns"
+          }, 
+          {
+            "value": "1fr 1fr 1fr",
+            "label": "Three Columns"
+          }, 
+          {
+            "value": "1fr 1fr 1fr 1fr",
+            "label": "Four Columns"
+          }
+        ]
+      }, 
+      {
+        "type": "header",
+        "content": "COLUMN SETTINGS"
+      },
+      {
+        "type": "select",
+        "id": "alignment",
+        "label": "Column content alignment",
+        "info": "Only available on desktop.",
+        "default": "center",
+        "options": [
+          {
+            "value": "start",
+            "label": "Top"
+          }, 
+          {
+            "value": "center",
+            "label": "Center"
+          }, 
+          {
+            "value": "end",
+            "label": "Bottom"
+          }
+        ]
+      }, 
+      {
+        "type": "range",
+        "id": "gap",
+        "min": 0,
+        "max": 144,
+        "step": 12,
+        "label": "Space between columns",
+        "default": 12
+      }, 
+      {
+        "type": "header",
+        "content": "DESKTOP COLUMN CONTAINER"
       },
       {
         "type": "range",
@@ -1402,15 +1490,6 @@
         "step": 20,
         "label": "Max container width",
         "default": 1200
-      }, 
-      {
-        "type": "range",
-        "id": "gap",
-        "min": 0,
-        "max": 144,
-        "step": 12,
-        "label": "Space between blocks",
-        "default": 12
       }, 
       {
         "type": "select",
@@ -1452,7 +1531,7 @@
             "label": "Bottom"
           }
         ],
-        "info": "Vertical position can only change if height is larger than the block."
+        "info": "Vertical position can only change if section height is larger than container height."
       }, 
       {
         "type": "header",
@@ -1477,7 +1556,7 @@
             "label": "Bottom"
           }
         ],
-        "info": "Vertical position can only change if height is larger than the block."
+        "info": "Vertical position can only change if section height is larger than container height."
       }, 
       {
         "type": "header",
@@ -1730,30 +1809,151 @@
       },
       {
         "type": "header",
-        "content": "DISPLAY SETTINGS"
-      }, 
+        "content": "MOBILE COLUMN ORDER"
+      },
       {
         "type": "select",
-        "id": "display_options",
-        "label": "Display option",
-        "default": "bl-hide-none",
+        "id": "first_order",
+        "label": "First column order",
+        "default": "",
         "options": [
           {
-            "value": "bl-hide-none",
-            "label": "Display everywhere"
+            "value": "",
+            "label": "N/A"
           }, 
           {
-            "value": "bl-hide-desktop",
-            "label": "Hide on desktop"
+            "value": "1",
+            "label": "Show first"
           }, 
           {
-            "value": "bl-hide-mobile",
-            "label": "Hide on mobile"
+            "value": "2",
+            "label": "Show second"
+          },
+          {
+            "value": "3",
+            "label": "Show third"
+          },
+          {
+            "value": "4",
+            "label": "Show fourth"
           }
         ]
+      },
+      {
+        "type": "select",
+        "id": "second_order",
+        "label": "Second column order",
+        "default": "",
+        "options": [
+          {
+            "value": "",
+            "label": "N/A"
+          }, 
+          {
+            "value": "1",
+            "label": "Show first"
+          }, 
+          {
+            "value": "2",
+            "label": "Show second"
+          },
+          {
+            "value": "3",
+            "label": "Show third"
+          },
+          {
+            "value": "4",
+            "label": "Show fourth"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "third_order",
+        "label": "Third column order",
+        "default": "",
+        "options": [
+          {
+            "value": "",
+            "label": "N/A"
+          }, 
+          {
+            "value": "1",
+            "label": "Show first"
+          }, 
+          {
+            "value": "2",
+            "label": "Show second"
+          },
+          {
+            "value": "3",
+            "label": "Show third"
+          },
+          {
+            "value": "4",
+            "label": "Show fourth"
+          }
+        ]
+      },
+      {
+        "type": "select",
+        "id": "fourth_order",
+        "label": "Fourth column order",
+        "default": "",
+        "options": [
+          {
+            "value": "",
+            "label": "N/A"
+          }, 
+          {
+            "value": "1",
+            "label": "Show first"
+          }, 
+          {
+            "value": "2",
+            "label": "Show second"
+          },
+          {
+            "value": "3",
+            "label": "Show third"
+          },
+          {
+            "value": "4",
+            "label": "Show fourth"
+          }
+        ]
+      },
+      {
+        "type": "header",
+        "content": "CUSTOM COLUMN RATIOS",
+        "info": "FOR EXPERTS ONLY! You can overwrite the above settings and add your own custom column ratios."
+      },
+      {
+        "type": "text",
+        "id": "first_column",
+        "label": "First column",
+        "info": "Use CSS values only E.g. 100%, 200px, 1fr"
+      },
+      {
+        "type": "text",
+        "id": "second_column",
+        "label": "Second column",
+        "info": "Use CSS values only E.g. 100%, 200px, 1fr"
+      },
+      {
+        "type": "text",
+        "id": "third_column",
+        "label": "Third column",
+        "info": "Use CSS values only E.g. 100%, 200px, 1fr"
+      },
+      {
+        "type": "text",
+        "id": "fourth_column",
+        "label": "Fourth column",
+        "info": "Use CSS values only E.g. 100%, 200px, 1fr"
       }
     ],
-    "max_blocks": 2,
+    "max_blocks": 4,
     "blocks": [
       {
         "type": "@app"
@@ -1763,6 +1963,34 @@
         "type": "text",
         "name": "Text",
         "settings": [
+            {
+                "type": "header",
+                "content": "DISPLAY SETTINGS"
+              }, 
+              {
+                "type": "select",
+                "id": "display_options",
+                "label": "Display option",
+                "default": "bl-hide-none",
+                "options": [
+                  {
+                    "value": "bl-hide-none",
+                    "label": "Display everywhere"
+                  }, 
+                  {
+                    "value": "bl-hide-desktop",
+                    "label": "Hide on desktop"
+                  }, 
+                  {
+                    "value": "bl-hide-mobile",
+                    "label": "Hide on mobile"
+                  }
+                ]
+              },
+          {
+            "type": "header",
+            "content": "CONTAINER STYLE"
+          },
           {
             "type": "select",
             "id": "text_align",
@@ -1782,10 +2010,6 @@
                 "value": "right"
               }
             ]
-          },
-          {
-            "type": "header",
-            "content": "CONTAINER STYLE"
           },
           {
             "type": "range",
@@ -2227,30 +2451,6 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
-          },
-          {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-          }, 
-          {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-              {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-              }, 
-              {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-              }, 
-              {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-              }
-            ]
           }
         ]
       },
@@ -2259,6 +2459,34 @@
         "type": "accordion",
         "name": "Accordion",
         "settings": [
+            {
+                "type": "header",
+                "content": "DISPLAY SETTINGS"
+              }, 
+              {
+                "type": "select",
+                "id": "display_options",
+                "label": "Display option",
+                "default": "bl-hide-none",
+                "options": [
+                  {
+                    "value": "bl-hide-none",
+                    "label": "Display everywhere"
+                  }, 
+                  {
+                    "value": "bl-hide-desktop",
+                    "label": "Hide on desktop"
+                  }, 
+                  {
+                    "value": "bl-hide-mobile",
+                    "label": "Hide on mobile"
+                  }
+                ]
+              },
+          {
+            "type": "header",
+            "content": "CONTAINER STYLE"
+          },
           {
             "type": "select",
             "id": "text_align",
@@ -2278,10 +2506,6 @@
                 "value": "right"
               }
             ]
-          },
-          {
-            "type": "header",
-            "content": "CONTAINER STYLE"
           },
           {
             "type": "range",
@@ -2708,8 +2932,15 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
-          },
-          {
+          }
+        ]
+      },
+      // ICON BLOCK SCHEMA
+      {
+      "type": "icons",
+      "name": "Icon",
+      "settings": [
+        {
             "type": "header",
             "content": "DISPLAY SETTINGS"
           }, 
@@ -2732,14 +2963,11 @@
                 "label": "Hide on mobile"
               }
             ]
-          }
-        ]
-      },
-      // ICON BLOCK SCHEMA
-      {
-      "type": "icons",
-      "name": "Icon",
-      "settings": [
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
           {
             "type": "select",
             "id": "text_align",
@@ -2759,10 +2987,6 @@
                 "value": "right"
               }
             ]
-          },
-          {
-            "type": "header",
-            "content": "COLUMN STYLE"
           },
           {
             "type": "range",
@@ -3121,30 +3345,6 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
-          },
-          {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-          }, 
-          {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-              {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-              }, 
-              {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-              }, 
-              {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-              }
-            ]
           }
         ]
       },
@@ -3153,6 +3353,34 @@
         "type": "stats",
         "name": "Stats",
         "settings": [
+            {
+                "type": "header",
+                "content": "DISPLAY SETTINGS"
+              }, 
+              {
+                "type": "select",
+                "id": "display_options",
+                "label": "Display option",
+                "default": "bl-hide-none",
+                "options": [
+                  {
+                    "value": "bl-hide-none",
+                    "label": "Display everywhere"
+                  }, 
+                  {
+                    "value": "bl-hide-desktop",
+                    "label": "Hide on desktop"
+                  }, 
+                  {
+                    "value": "bl-hide-mobile",
+                    "label": "Hide on mobile"
+                  }
+                ]
+              },
+          {
+            "type": "header",
+            "content": "CONTAINER STYLE"
+          },
           {
             "type": "select",
             "id": "text_align",
@@ -3172,10 +3400,6 @@
                 "value": "right"
               }
             ]
-          },
-          {
-            "type": "header",
-            "content": "CONTAINER STYLE"
           },
           {
             "type": "range",
@@ -3580,30 +3804,6 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
-          },
-          {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-          }, 
-          {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-              {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-              }, 
-              {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-              }, 
-              {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-              }
-            ]
           }
         ]
       },
@@ -3612,6 +3812,34 @@
         "type": "tooltip",
         "name": "Tooltip",
         "settings": [
+            {
+                "type": "header",
+                "content": "DISPLAY SETTINGS"
+              }, 
+              {
+                "type": "select",
+                "id": "display_options",
+                "label": "Display option",
+                "default": "bl-hide-none",
+                "options": [
+                  {
+                    "value": "bl-hide-none",
+                    "label": "Display everywhere"
+                  }, 
+                  {
+                    "value": "bl-hide-desktop",
+                    "label": "Hide on desktop"
+                  }, 
+                  {
+                    "value": "bl-hide-mobile",
+                    "label": "Hide on mobile"
+                  }
+                ]
+              },
+          {
+            "type": "header",
+            "content": "CONTAINER STYLE"
+          },
           {
             "type": "select",
             "id": "text_align",
@@ -3631,10 +3859,6 @@
                 "value": "right"
               }
             ]
-          },
-          {
-            "type": "header",
-            "content": "CONTAINER STYLE"
           },
           {
             "type": "range",
@@ -3967,30 +4191,6 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
-          },
-          {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-          }, 
-          {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-              {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-              }, 
-              {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-              }, 
-              {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-              }
-            ]
           }
         ]
       },
@@ -3999,6 +4199,30 @@
         "type": "quote",
         "name": "Quote",
         "settings": [
+            {
+                "type": "header",
+                "content": "DISPLAY SETTINGS"
+              }, 
+              {
+                "type": "select",
+                "id": "display_options",
+                "label": "Display option",
+                "default": "bl-hide-none",
+                "options": [
+                  {
+                    "value": "bl-hide-none",
+                    "label": "Display everywhere"
+                  }, 
+                  {
+                    "value": "bl-hide-desktop",
+                    "label": "Hide on desktop"
+                  }, 
+                  {
+                    "value": "bl-hide-mobile",
+                    "label": "Hide on mobile"
+                  }
+                ]
+              },
           {
             "type": "header",
             "content": "ALIGNMENT"
@@ -4428,30 +4652,6 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
-          },
-          {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-          }, 
-          {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-              {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-              }, 
-              {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-              }, 
-              {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-              }
-            ]
           }
         ]
       },
@@ -4460,6 +4660,30 @@
         "type": "list",
         "name": "List",
         "settings": [
+            {
+                "type": "header",
+                "content": "DISPLAY SETTINGS"
+              }, 
+              {
+                "type": "select",
+                "id": "display_options",
+                "label": "Display option",
+                "default": "bl-hide-none",
+                "options": [
+                  {
+                    "value": "bl-hide-none",
+                    "label": "Display everywhere"
+                  }, 
+                  {
+                    "value": "bl-hide-desktop",
+                    "label": "Hide on desktop"
+                  }, 
+                  {
+                    "value": "bl-hide-mobile",
+                    "label": "Hide on mobile"
+                  }
+                ]
+              },
           {
             "type": "header",
             "content": "CONTAINER STYLE"
@@ -4938,30 +5162,6 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
-          },
-          {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-          }, 
-          {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-              {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-              }, 
-              {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-              }, 
-              {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-              }
-            ]
           }
         ]
       },
@@ -4970,6 +5170,34 @@
         "type": "text-and-image",
         "name": "Text and image",
         "settings": [
+            {
+                "type": "header",
+                "content": "DISPLAY SETTINGS"
+              }, 
+              {
+                "type": "select",
+                "id": "display_options",
+                "label": "Display option",
+                "default": "bl-hide-none",
+                "options": [
+                  {
+                    "value": "bl-hide-none",
+                    "label": "Display everywhere"
+                  }, 
+                  {
+                    "value": "bl-hide-desktop",
+                    "label": "Hide on desktop"
+                  }, 
+                  {
+                    "value": "bl-hide-mobile",
+                    "label": "Hide on mobile"
+                  }
+                ]
+              },
+          {
+            "type": "header",
+            "content": "CONTAINER STYLE"
+          },
           {
             "type": "select",
             "id": "text_align",
@@ -4989,10 +5217,6 @@
                 "value": "right"
               }
             ]
-          },
-          {
-            "type": "header",
-            "content": "CONTAINER STYLE"
           },
           {
             "type": "range",
@@ -5570,6 +5794,22 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
+          }
+        ]
+      },
+      // PRODUCT BLOCK SCHEMA
+      {
+        "type": "product",
+        "name": "Product",
+        "settings": [
+          {
+            "type": "header",
+            "content": "PRODUCT"
+          },
+          {
+            "type": "product",
+            "id": "product_handle",
+            "label": "Product"
           },
           {
             "type": "header",
@@ -5594,26 +5834,10 @@
                 "label": "Hide on mobile"
               }
             ]
-          }
-        ]
-      },
-      // PRODUCT BLOCK SCHEMA
-      {
-        "type": "product",
-        "name": "Product",
-        "settings": [
-          {
-            "type": "header",
-            "content": "PRODUCT"
-          },
-          {
-            "type": "product",
-            "id": "product_handle",
-            "label": "Product"
           },
           {
             "type": "header",
-            "content": "ALIGNMENT"
+            "content": "CONTAINER STYLE"
           },
           {
             "type": "select",
@@ -5634,10 +5858,6 @@
                 "value": "right"
               }
             ]
-          },
-          {
-            "type": "header",
-            "content": "CONTAINER STYLE"
           },
           {
             "type": "range",
@@ -6197,30 +6417,6 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
-          },
-          {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-          }, 
-          {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-              {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-              }, 
-              {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-              }, 
-              {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-              }
-            ]
           }
         ]
       },
@@ -6229,6 +6425,34 @@
         "type": "button",
         "name": "Buttons",
         "settings": [
+            {
+                "type": "header",
+                "content": "DISPLAY SETTINGS"
+              }, 
+              {
+                "type": "select",
+                "id": "display_options",
+                "label": "Display option",
+                "default": "bl-hide-none",
+                "options": [
+                  {
+                    "value": "bl-hide-none",
+                    "label": "Display everywhere"
+                  }, 
+                  {
+                    "value": "bl-hide-desktop",
+                    "label": "Hide on desktop"
+                  }, 
+                  {
+                    "value": "bl-hide-mobile",
+                    "label": "Hide on mobile"
+                  }
+                ]
+              },
+          {
+            "type": "header",
+            "content": "CONTAINER STYLE"
+          },
           {
             "type": "select",
             "id": "text_align",
@@ -6248,10 +6472,6 @@
                 "value": "right"
               }
             ]
-          },
-          {
-            "type": "header",
-            "content": "CONTAINER STYLE"
           },
           {
             "type": "range",
@@ -6723,30 +6943,6 @@
             "step": 5,
             "label": "Overlay opacity",
             "default": 60
-          },
-          {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-          }, 
-          {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-              {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-              }, 
-              {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-              }, 
-              {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-              }
-            ]
           }
         ]
       },
@@ -6892,6 +7088,30 @@
         "type": "image",
         "name": "Image",
         "settings": [
+            {
+                "type": "header",
+                "content": "DISPLAY SETTINGS"
+              }, 
+              {
+                "type": "select",
+                "id": "display_options",
+                "label": "Display option",
+                "default": "bl-hide-none",
+                "options": [
+                  {
+                    "value": "bl-hide-none",
+                    "label": "Display everywhere"
+                  }, 
+                  {
+                    "value": "bl-hide-desktop",
+                    "label": "Hide on desktop"
+                  }, 
+                  {
+                    "value": "bl-hide-mobile",
+                    "label": "Hide on mobile"
+                  }
+                ]
+              },
           {
             "type": "header",
             "content": "IMAGE"
@@ -7017,41 +7237,20 @@
                 "label": "Bottom"
               }
             ]
-          },
-          {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-          }, 
-          {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-              {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-              }, 
-              {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-              }, 
-              {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-              }
-            ]
           }
         ]
       }
     ],
     "presets": [
       {
-        "name": "One Column Section ◰",
+        "name": "Flexi Section 🙌",
         "category": "Text",
         "blocks": [
           {
             "type": "text"
+          },
+          {
+            "type": "image"
           }
         ]
       }
