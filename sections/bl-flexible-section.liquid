@@ -11,14 +11,14 @@
 -%}
 
 {%- style -%}
-  #bl-two-column-section--{{ sectionid }}{
+  #bl-flexi-column-section--{{ sectionid }}{
     {%- if bg_color != 'rgba(0,0,0,0)' and bg_color != '' -%}
       background-color: {{ bg_color }};
     {%- endif -%}
   }
 
   {% if section.settings.bg_image != blank %}
-    #bl-two-column-section--{{ sectionid }}{
+    #bl-flexi-column-section--{{ sectionid }}{
         min-height: 100%;
         background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
         background-size: {{ section.settings.bg_image_size }};
@@ -37,7 +37,7 @@
     .bl-blocks-wrapper--{{ sectionid }} {
       display: flex;
       justify-content: center;
-      align-items: {{ section.settings.mb_vertical }};
+      align-items: center;
     }
 
     .bl-blocks--{{ sectionid }} {
@@ -45,20 +45,19 @@
     }
 
     .bl-blocks-wrapper--{{ sectionid }} {
-      justify-content: {{ section.settings.horizontal }};
-      align-items: {{ section.settings.vertical }};
+      justify-content: center;
+      align-items: center;
     }
 
     .bl-blocks--{{ sectionid }} {   
       grid-template-columns: 
-        {% if section.settings.first_column == blank %} {{ section.settings.column_ratios }}{% endif %}
-        {% if section.settings.first_column != blank %} {{ section.settings.first_column }}{% endif %}
-        {% if section.settings.second_column != blank %} {{ section.settings.second_column }}{% endif %}
-        {% if section.settings.third_column != blank %} {{ section.settings.third_column }}{% endif %}
-        {% if section.settings.fourth_column != blank %} {{ section.settings.fourth_column }}{% endif %}
+        {{ section.settings.first_column }}%
+        {% if section.settings.second_column != 0 %} {{ section.settings.second_column }}%{% endif %}
+        {% if section.settings.third_column != 0 %} {{ section.settings.third_column }}%{% endif %}
+        {% if section.settings.fourth_column != 0 %} {{ section.settings.fourth_column }}%{% endif %}
         ;
-      align-items: {{ section.settings.alignment }};
-      width: {{ section.settings.wrapper }}%;
+      height: 100%;
+      width: 100%;
     }
   }
 
@@ -95,10 +94,10 @@
 {%- endstyle -%}
 
 <section
-  id="bl-two-column-section--{{ sectionid }}"
+  id="bl-flexi-column-section--{{ sectionid }}"
   class="bl-section-padding--{{ sectionid }} {{ section.settings.display_options }}">
   <div class="bl-img-overlay">
-      <div style="max-width: {{ section.settings.width }}px;" class="bl-blocks-wrapper--{{ sectionid }} {{ section.settings.dt_height }} {{ section.settings.mb_height }} bl-m-auto bl-px-4">
+      <div style="max-width: {% if section.settings.full_width %}100%{% else %}{{ section.settings.width }}px;{% endif %}" class="bl-blocks-wrapper--{{ sectionid }} {{ section.settings.dt_height }} {{ section.settings.mb_height }} bl-m-auto">
         <div class="bl-blocks--{{ sectionid }}">
 
           {% for block in section.blocks %}
@@ -113,6 +112,7 @@
               {% when 'text' %}
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -158,8 +158,11 @@
                   }
                 }
                 {%- endstyle -%}
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
                   {% if block.settings.subheading != blank %}
                     <h5 class="bl-subheading" style="color: {{ block.settings.subheading_color }}; letter-spacing: {{ block.settings.subheading_letter }}px; margin: 0px 0px {{ block.settings.subheading_space }}px 0px;">{{ block.settings.subheading }}</h4>
                   {% endif %}
@@ -177,7 +180,7 @@
                   {% endif %}
 
                   {% if block.settings.under_text != blank %}
-                    <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px 0px {{ block.settings.under_text_space }}px 0px;">{{ block.settings.under_text }}</div>
+                    <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px;">{{ block.settings.under_text }}</div>
                   {% endif %}
                 </div>
               </div>
@@ -186,6 +189,7 @@
               {% when 'accordion' %}
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -287,8 +291,10 @@
                   padding-bottom: {{ block.settings.accordion_column_padding }}px;
                 }
                 {%- endstyle -%}
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }} bl-w-full" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
                   {% if block.settings.subheading != blank %}
                     <h5 class="bl-subheading" style="color: {{ block.settings.subheading_color }}; letter-spacing: {{ block.settings.subheading_letter }}px; margin: 0px 0px {{ block.settings.subheading_space }}px 0px;">{{ block.settings.subheading }}</h4>
                   {% endif %}
@@ -373,6 +379,7 @@
               {% when 'stats' %}
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -428,8 +435,10 @@
                   </div>
                 {% endcapture %}
 
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
                   
                   {% if block.settings.statsup == true %}
                     {{ stats_area }}
@@ -459,6 +468,7 @@
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
                   assign image_overlay = block.settings.img_opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -509,8 +519,10 @@
                   {% endif %}
                 {% endcapture %}
 
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
                   
                   {% if block.settings.statsup == false %}
                     {{ icon_area }}
@@ -539,6 +551,7 @@
               {% when 'tooltip' %}
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -612,8 +625,10 @@
                   visibility: visible;
                 }
                 {%- endstyle -%}
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
                   {% if block.settings.subheading != blank %}
                     <h5 class="bl-subheading" style="color: {{ block.settings.subheading_color }}; letter-spacing: {{ block.settings.subheading_letter }}px; margin: 0px 0px {{ block.settings.subheading_space }}px 0px;">{{ block.settings.subheading }}</h4>
                   {% endif %}
@@ -642,6 +657,7 @@
               {% when 'list' %}
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -687,8 +703,10 @@
                   }
                 }
                 {%- endstyle -%}
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
                   {% if block.settings.subheading != blank %}
                     <h5 class="bl-subheading" style="color: {{ block.settings.subheading_color }}; letter-spacing: {{ block.settings.subheading_letter }}px; margin: 0px 0px {{ block.settings.subheading_space }}px 0px;">{{ block.settings.subheading }}</h4>
                   {% endif %}
@@ -726,7 +744,7 @@
                   {% endif %}
 
                   {% if block.settings.under_text != blank %}
-                    <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px 0px {{ block.settings.under_text_space }}px 0px;">{{ block.settings.under_text }}</div>
+                    <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px;">{{ block.settings.under_text }}</div>
                   {% endif %}
                 </div>
               </div>
@@ -736,6 +754,7 @@
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
                   assign image_overlay = block.settings.img_opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -797,8 +816,10 @@
                   }
                 }
                 {%- endstyle -%}
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
                   
                   {% if block.settings.img_image != blank %}
                     <div class="bl--block bl--image-wrapper--{{ block.id }}" style="display: block; width: 100%; {% if block.settings.img_image != blank %} background: linear-gradient(0deg, {{ block.settings.img_overlay_color | color_modify: 'alpha', image_overlay }}, {{ block.settings.img_overlay_color | color_modify: 'alpha', image_overlay }}), url('{{ block.settings.img_image | img_url: '1024x' }}'); background-size: {{ block.settings.img_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.img_image_alignment_x }}; background-position-y: {{ block.settings.img_image_alignment_y }}; {% endif %} border-radius: {{ block.settings.img_border_radius }}px;"></div>
@@ -826,7 +847,7 @@
                     {% endif %}
 
                     {% if block.settings.under_text != blank %}
-                      <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px 0px {{ block.settings.under_text_space }}px 0px;">{{ block.settings.under_text }}</div>
+                      <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px;">{{ block.settings.under_text }}</div>
                     {% endif %}
                   </div>
                 </div>
@@ -837,6 +858,7 @@
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
                   assign image_overlay = block.settings.img_opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -904,8 +926,10 @@
                   }
                 }
                 {%- endstyle -%}
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
                 
                   <div style="padding: {{ block.settings.text_padding_y }}px {{ block.settings.text_padding_x }}px;">
 
@@ -946,6 +970,7 @@
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
                   assign image_overlay = block.settings.img_opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -1008,8 +1033,10 @@
                   }
                 }
                 {%- endstyle -%}
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
                   
                   {% if block.settings.product_handle.featured_image != blank %}
                     <div class="bl--block bl--image-wrapper--{{ block.id }}" style="display: block; width: 100%; background-position: center; {% if block.settings.product_handle.featured_image != blank %} background: linear-gradient(0deg, {{ block.settings.img_overlay_color | color_modify: 'alpha', image_overlay }}, {{ block.settings.img_overlay_color | color_modify: 'alpha', image_overlay }}), url('{{ block.settings.product_handle.featured_image | img_url: '600x600' }}'); background-size: {{ block.settings.img_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.img_image_alignment_x }}; background-position-y: {{ block.settings.img_image_alignment_y }};{% endif %} border-radius: {{ block.settings.img_border_radius }}px;"></div>
@@ -1038,7 +1065,7 @@
                     {% endif %}
 
                     {% if block.settings.under_text != blank %}
-                      <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px 0px {{ block.settings.under_text_space }}px 0px;">{{ block.settings.under_text }}</div>
+                      <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px;">{{ block.settings.under_text }}</div>
                     {% endif %}
                   </div>
                 </div>
@@ -1048,6 +1075,7 @@
               {% when 'button' %}
                 {%- liquid
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
+                  assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
                 -%}
 
@@ -1081,8 +1109,10 @@
                   }
                 }
                 {%- endstyle -%}
-                <div class="bl-text-container bl--block {{ block.settings.display_options }}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); min-height: 100%; background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}">
+                {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
+
+                <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
+                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
 
                   {% if block.settings.heading != blank %}
                     <h2 class="bl-heading" style="color: {{ block.settings.heading_color }};  margin: 0px 0px {{ block.settings.heading_space }}px 0px;">{{ block.settings.heading }}</h2>
@@ -1099,7 +1129,7 @@
                   </div>
 
                   {% if block.settings.under_text != blank %}
-                    <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px 0px {{ block.settings.under_text_space }}px 0px;">{{ block.settings.under_text }}</div>
+                    <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px;">{{ block.settings.under_text }}</div>
                   {% endif %}
                 </div>
               </div>
@@ -1137,39 +1167,44 @@
 
               {% comment %} IMAGE BLOCK {% endcomment %}
               {% when 'image' %}
+                {%- liquid
+                  assign image_overlay = block.settings.opacity | divided_by: 100.00
+                  assign full_height = block.settings.img_full_height
+                  assign blockid = block.id
+                  -%}
                 {%- style -%}
 
                 .bl--image-wrapper--{{ block.id }} {
-                  height: {{ block.settings.desktop_img_height }}px;
+                  height: {% if full_height %}100%{% else %}{{ block.settings.desktop_img_height }}px{% endif %};
                 }
                 .bl--image-wrapper--{{ block.id }} svg {
-                  background-color: lightgray;
+                  display: block;
+                  margin: auto;
                   border-radius: {{ block.settings.img_border_radius }}px;
-                  height: {{ block.settings.desktop_img_height }}px;
+                  height: {% if full_height %}100%{% else %}{{ block.settings.desktop_img_height }}px{% endif %};
                 }
 
                 @media only screen and (max-width: 768px) {
                   .bl--image-wrapper--{{ block.id }} {
-                    height: {{ block.settings.mobile_img_height }}px;
+                    height: {% if full_height %}100%{% else %}{{ block.settings.mobile_img_height }}px{% endif %};
                   }
                   .bl--image-wrapper--{{ block.id }} svg {
-                    height: {{ block.settings.mobile_img_height }}px;
+                    height: {% if full_height %}100%{% else %}{{ block.settings.mobile_img_height }}px{% endif %};
                   }
                 }
                 {%- endstyle -%}
-                {%- liquid
-                assign image_overlay = block.settings.opacity | divided_by: 100.00
-                assign blockid = block.id
-                -%}
                 {% if block.settings.bg_image != blank %}
-                  <div class="bl--block {{ block.settings.display_options }} bl--image-wrapper--{{ blockid }}" style="display: block; width: 100%; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.img_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.img_image_alignment_x }}; background-position-y: {{ block.settings.img_image_alignment_y }};{% endif %} border-radius: {{ block.settings.border_radius }}px;"></div>
+                  <div class="bl--block bl-text-container {{ block.settings.display_options }}">
+                    <div class="bl--image-wrapper--{{ blockid }}" style="display: block; width: 100%; {% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.img_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.img_image_alignment_x }}; background-position-y: {{ block.settings.img_image_alignment_y }};{% endif %} border-radius: {{ block.settings.border_radius }}px;"></div>
+                  </div>
                 {% else %}
-                  <div class="bl--block {{ block.settings.display_options }} bl--image-wrapper--{{ blockid }}">
-                    {{ 'product-1' | placeholder_svg_tag }}
+                  <div class="bl--block bl-text-container {{ block.settings.display_options }}">
+                    <div class="bl--image-wrapper--{{ blockid }}" style="display: block; width: 100%; background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', image_overlay }}); background-size: {{ block.settings.img_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.img_image_alignment_x }}; background-position-y: {{ block.settings.img_image_alignment_y }}; border-radius: {{ block.settings.border_radius }}px; background-color: lightgray;">
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    </div>
                   </div>
                 {% endif %}
                   
-
             {% endcase %}
           {% endfor %}
 
@@ -1183,201 +1218,101 @@
     "name": "Flexi Section 🙌",
     "class": "starter",
     "settings": [
-        {
-            "type": "header",
-            "content": "DISPLAY SETTINGS"
-        }, 
-        {
-            "type": "select",
-            "id": "display_options",
-            "label": "Display option",
-            "default": "bl-hide-none",
-            "options": [
-                {
-                "value": "bl-hide-none",
-                "label": "Display everywhere"
-                }, 
-                {
-                "value": "bl-hide-desktop",
-                "label": "Hide on desktop"
-                }, 
-                {
-                "value": "bl-hide-mobile",
-                "label": "Hide on mobile"
-                }
-            ]
-        },
       {
         "type": "header",
-        "content": "COLUMN RATIOS"
+        "content": "COLUMNS",
+        "info": "Column widths must equal 100%"
       },
       {
-        "type": "select",
-        "id": "column_ratios",
-        "label": "Column width ratio",
-        "info": "Change the distribution of your columns on desktop.",
-        "default": "1fr 1fr",
-        "options": [
-          {
-            "value": "1fr",
-            "label": "One Column"
-          }, 
-          {
-            "value": "1fr 1fr",
-            "label": "Two Columns"
-          }, 
-          {
-            "value": "1fr 1fr 1fr",
-            "label": "Three Columns"
-          }, 
-          {
-            "value": "1fr 1fr 1fr 1fr",
-            "label": "Four Columns"
-          }
-        ]
-      }, 
+        "type": "range",
+        "id": "first_column",
+        "info": "E.g. a one column width will be 100%",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "First column width",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "second_column",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Second column width",
+        "default": 50
+      },
+      {
+        "type": "range",
+        "id": "third_column",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Second column width",
+        "default": 0
+      },
+      {
+        "type": "range",
+        "id": "fourth_column",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "label": "Second column width",
+        "default": 0
+      },
       {
         "type": "header",
         "content": "COLUMN SETTINGS"
       },
       {
-        "type": "select",
-        "id": "alignment",
-        "label": "Column content alignment",
-        "info": "Only available on desktop.",
-        "default": "center",
-        "options": [
-          {
-            "value": "start",
-            "label": "Top"
-          }, 
-          {
-            "value": "center",
-            "label": "Center"
-          }, 
-          {
-            "value": "end",
-            "label": "Bottom"
-          }
-        ]
-      }, 
-      {
         "type": "range",
         "id": "gap",
         "min": 0,
         "max": 144,
-        "step": 12,
+        "step": 2,
+        "unit": "px",
         "label": "Space between columns",
         "default": 12
       }, 
       {
-        "type": "header",
-        "content": "DESKTOP COLUMN CONTAINER"
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Force full width",
+        "default": false,
+        "info": "Override the max width setting below."
       },
-      {
-        "type": "range",
-        "id": "wrapper",
-        "min": 20,
-        "max": 100,
-        "step": 5,
-        "unit": "%",
-        "label": "Container width",
-        "default": 80
-      }, 
       {
         "type": "range",
         "id": "width",
         "min": 320,
         "max": 1440,
         "step": 20,
+        "unit": "px",
         "label": "Max container width",
         "default": 1200
-      }, 
-      {
-        "type": "select",
-        "id": "horizontal",
-        "label": "Container horizontal alignment",
-        "default": "center",
-        "options": [
-          {
-            "value": "flex-start",
-            "label": "Left"
-          }, 
-          {
-            "value": "center",
-            "label": "Center"
-          }, 
-          {
-            "value": "flex-end",
-            "label": "Right"
-          }
-        ],
-        "info": "Container width needs to be less than 100%."
-      }, 
-      {
-        "type": "select",
-        "id": "vertical",
-        "label": "Container vertical alignment",
-        "default": "center",
-        "options": [
-          {
-            "value": "flex-start",
-            "label": "Top"
-          }, 
-          {
-            "value": "center",
-            "label": "Center"
-          }, 
-          {
-            "value": "flex-end",
-            "label": "Bottom"
-          }
-        ],
-        "info": "Vertical position can only change if section height is larger than container height."
-      }, 
-      {
-        "type": "header",
-        "content": "MOBILE COLUMN CONTAINER"
       },
       {
-        "type": "select",
-        "id": "mb_vertical",
-        "label": "Container vertical alignment",
-        "default": "center",
-        "options": [
-          {
-            "value": "flex-start",
-            "label": "Top"
-          }, 
-          {
-            "value": "center",
-            "label": "Center"
-          }, 
-          {
-            "value": "flex-end",
-            "label": "Bottom"
-          }
-        ],
-        "info": "Vertical position can only change if section height is larger than container height."
-      }, 
-      {
         "type": "header",
-        "content": "BACKGROUND"
+        "content": "SECTION BACKGROUND"
       }, 
       {
         "type": "color",
         "id": "bg_color",
-        "label": "Background"
+        "label": "Section background color"
       },
       {
         "type": "image_picker",
         "id": "bg_image",
-        "label": "Background image"
+        "label": "Section background image"
       }, 
       {
         "type": "select",
         "id": "bg_image_size",
-        "label": "Image size",
+        "label": "Section background image size",
         "default": "cover",
         "options": [
           {
@@ -1392,12 +1327,12 @@
       }, 
       {
         "type": "header",
-        "content": "IMAGE OVERLAY"
+        "content": "SECTION IMAGE OVERLAY"
       }, 
       {
         "type": "color",
         "id": "overlay_color",
-        "label": "Overlay color",
+        "label": "Section background image overlay color",
         "default": "#000000"
       },
       {
@@ -1406,7 +1341,7 @@
         "min": 0,
         "max": 100,
         "step": 5,
-        "label": "Overlay opacity",
+        "label": "Section background image overlay opacity",
         "default": 60
       }, 
       {
@@ -1416,7 +1351,7 @@
       {
         "type": "select",
         "id": "dt_height",
-        "label": "Desktop section height",
+        "label": "Section desktop height",
         "default": "height--none",
         "options": [
           {
@@ -1472,7 +1407,7 @@
       {
         "type": "select",
         "id": "mb_height",
-        "label": "Mobile section height",
+        "label": "Section mobile height",
         "default": "mb-height--none",
         "options": [
           {
@@ -1527,7 +1462,7 @@
       }, 
       {
         "type": "header",
-        "content": "DESKTOP SECTION PADDING"
+        "content": "SECTION DESKTOP PADDING"
       }, 
       {
         "type": "range",
@@ -1536,7 +1471,7 @@
         "max": 100,
         "step": 1,
         "unit": "px",
-        "label": "Padding top",
+        "label": "Desktop padding top",
         "default": 60
       }, 
       {
@@ -1546,7 +1481,7 @@
         "max": 100,
         "step": 1,
         "unit": "px",
-        "label": "Padding bottom",
+        "label": "Desktop padding bottom",
         "default": 60
       }, {
         "type": "range",
@@ -1555,7 +1490,7 @@
         "max": 100,
         "step": 1,
         "unit": "px",
-        "label": "Padding left",
+        "label": "Desktop padding left",
         "default": 24
       }, {
         "type": "range",
@@ -1564,12 +1499,12 @@
         "max": 100,
         "step": 1,
         "unit": "px",
-        "label": "Padding right",
+        "label": "Desktop padding right",
         "default": 24
       }, 
       {
         "type": "header",
-        "content": "MOBILE SECTION PADDING"
+        "content": "SECTION MOBILE PADDING"
       },
       {
         "type": "range",
@@ -1578,7 +1513,7 @@
         "max": 100,
         "step": 1,
         "unit": "px",
-        "label": "Padding top",
+        "label": "Mobile padding top",
         "default": 60
       }, 
       {
@@ -1588,7 +1523,7 @@
         "max": 100,
         "step": 1,
         "unit": "px",
-        "label": "Padding bottom",
+        "label": "Mobile padding bottom",
         "default": 60
       }, {
         "type": "range",
@@ -1597,7 +1532,7 @@
         "max": 100,
         "step": 1,
         "unit": "px",
-        "label": "Padding left",
+        "label": "Mobile padding left",
         "default": 12
       }, {
         "type": "range",
@@ -1606,7 +1541,7 @@
         "max": 100,
         "step": 1,
         "unit": "px",
-        "label": "Padding right",
+        "label": "Mobile padding right",
         "default": 12
       },
       {
@@ -1726,33 +1661,28 @@
         ]
       },
       {
-        "type": "header",
-        "content": "CUSTOM COLUMN RATIOS",
-        "info": "FOR EXPERTS ONLY! You can overwrite the above settings and add your own custom column ratios."
-      },
+          "type": "header",
+          "content": "SECTION DISPLAY SETTINGS"
+      }, 
       {
-        "type": "text",
-        "id": "first_column",
-        "label": "First column",
-        "info": "Use CSS values only E.g. 100%, 200px, 1fr"
-      },
-      {
-        "type": "text",
-        "id": "second_column",
-        "label": "Second column",
-        "info": "Use CSS values only E.g. 100%, 200px, 1fr"
-      },
-      {
-        "type": "text",
-        "id": "third_column",
-        "label": "Third column",
-        "info": "Use CSS values only E.g. 100%, 200px, 1fr"
-      },
-      {
-        "type": "text",
-        "id": "fourth_column",
-        "label": "Fourth column",
-        "info": "Use CSS values only E.g. 100%, 200px, 1fr"
+          "type": "select",
+          "id": "display_options",
+          "label": "Section display settings",
+          "default": "bl-hide-none",
+          "options": [
+              {
+              "value": "bl-hide-none",
+              "label": "Display everywhere"
+              }, 
+              {
+              "value": "bl-hide-desktop",
+              "label": "Hide on desktop"
+              }, 
+              {
+              "value": "bl-hide-mobile",
+              "label": "Hide on mobile"
+              }
+          ]
       }
     ],
     "max_blocks": 4,
@@ -1765,39 +1695,39 @@
         "type": "text",
         "name": "Text",
         "settings": [
-            {
-                "type": "header",
-                "content": "DISPLAY SETTINGS"
-              }, 
-              {
-                "type": "select",
-                "id": "display_options",
-                "label": "Display option",
-                "default": "bl-hide-none",
-                "options": [
-                  {
-                    "value": "bl-hide-none",
-                    "label": "Display everywhere"
-                  }, 
-                  {
-                    "value": "bl-hide-desktop",
-                    "label": "Hide on desktop"
-                  }, 
-                  {
-                    "value": "bl-hide-mobile",
-                    "label": "Hide on mobile"
-                  }
-                ]
-              },
           {
             "type": "header",
-            "content": "CONTAINER STYLE"
+            "content": "BLOCK DISPLAY SETTINGS"
+          }, 
+          {
+            "type": "select",
+            "id": "display_options",
+            "label": "Block display settings",
+            "default": "bl-hide-none",
+            "options": [
+              {
+                "value": "bl-hide-none",
+                "label": "Display everywhere"
+              }, 
+              {
+                "value": "bl-hide-desktop",
+                "label": "Hide on desktop"
+              }, 
+              {
+                "value": "bl-hide-mobile",
+                "label": "Hide on mobile"
+              }
+            ]
+          },
+          {
+            "type": "header",
+            "content": "BLOCK STYLE"
           },
           {
             "type": "select",
             "id": "text_align",
-            "label": "Text alignment",
-            "default": "center",
+            "label": "Block text alignment",
+            "default": "left",
             "options": [
               {
                 "label": "Left",
@@ -1819,7 +1749,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "unit": "px",
+            "label": "Block desktop padding",
             "default": 24
           }, 
           {
@@ -1828,7 +1759,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "unit": "px",
+            "label": "Block mobile padding",
             "default": 24
           }, 
           {
@@ -1838,7 +1770,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -1848,19 +1780,49 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
             "default": "#ffffff"
           },
           {
@@ -1870,13 +1832,12 @@
           {
             "type": "richtext",
             "id": "subheading",
-            "label": "Text",
-            "default": "<p>Subheading</p>"
+            "label": "Subheading text"
           },
           {
             "type": "color",
             "id": "subheading_color",
-            "label": "Font color",
+            "label": "Subheading font color",
             "default": "#000000"
           },
           {
@@ -1885,7 +1846,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Subheading desktop font size",
             "default": 14
           }, 
           {
@@ -1894,7 +1856,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Subheading mobile font size",
             "default": 14
           }, 
           {
@@ -1903,7 +1866,8 @@
             "min": 0,
             "max": 24,
             "step": 1,
-            "label": "Letter spacing",
+            "unit": "px",
+            "label": "Subheading letter spacing",
             "default": 1
           }, 
           {
@@ -1912,7 +1876,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Subheading bottom spacing",
             "default": 12
           }, 
           {
@@ -1922,14 +1887,14 @@
           {
             "type": "richtext",
             "id": "heading",
-            "label": "Text",
-            "default": "<p>TEXT BLOCK</p>",
+            "label": "Heading text",
+            "default": "<p>Text block</p>",
             "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below!"
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Heading font color",
             "default": "#000000"
           },
           {
@@ -1938,7 +1903,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Heading desktop font size",
             "default": 36
           }, 
           {
@@ -1947,7 +1913,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Heading mobile font size",
             "default": 24
           }, 
           {
@@ -1956,7 +1923,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Heading bottom spacing",
             "default": 12
           },
           {
@@ -1966,13 +1934,13 @@
           {
             "type": "richtext",
             "id": "description",
-            "label": "Text",
-            "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
+            "label": "Description text",
+            "default": "<p>Use this text to share information about your brand with your customers.</p>"
           },
           {
             "type": "color",
             "id": "description_color",
-            "label": "Font color",
+            "label": "Description font color",
             "default": "#000000"
           },
           {
@@ -1981,7 +1949,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Description desktop font size",
             "default": 16
           }, 
           {
@@ -1990,7 +1959,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Description mobile font size",
             "default": 14
           }, 
           {
@@ -1999,7 +1969,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Description bottom spacing",
             "default": 12
           },
           {
@@ -2009,29 +1980,24 @@
           {
             "type": "text",
             "id": "btn_text",
-            "label": "Text",
+            "label": "Button text",
             "default": "Read More"
-          }, {
-            "type": "url",
-            "id": "btn_link",
-            "label": "URL"
           }, 
           {
-            "type": "checkbox",
-            "id": "underline_show",
-            "label": "Show underline",
-            "default": false
-          },
+            "type": "url",
+            "id": "btn_link",
+            "label": "Button link"
+          }, 
           {
             "type": "color",
             "id": "btn_color",
-            "label": "Font color",
+            "label": "Button font color",
             "default": "#FAFAFA"
           },
           {
             "type": "color",
             "id": "btn_bg_color",
-            "label": "Background color",
+            "label": "Button background color",
             "default": "#008060"
           },
           {
@@ -2040,7 +2006,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Button desktop font size",
             "default": 16
           }, 
           {
@@ -2049,13 +2016,14 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Button mobile font size",
             "default": 14
           }, 
           {
             "type": "select",
             "id": "btn_size",
-            "label": "Button size",
+            "label": "Button style",
             "default": "bl-btn--md",
             "options": [
               {
@@ -2089,6 +2057,10 @@
               {
                 "value": "bl-btn--full-w-tall",
                 "label": "Full Width - Tall"
+              },
+              {
+                "value": "bl-btn--underline",
+                "label": "Underline"
               }
             ]
           }, 
@@ -2099,7 +2071,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Button border width",
             "default": 0
           }, 
           {
@@ -2109,13 +2081,13 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Button border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "btn_border_color",
-            "label": "Border color",
+            "label": "Button border color",
             "default": "#000000"
           },
           {
@@ -2124,7 +2096,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Button bottom spacing",
             "default": 12
           }, 
           {
@@ -2134,13 +2107,12 @@
           {
             "type": "richtext",
             "id": "under_text",
-            "label": "Under button text",
-            "default": "<p>Quick objection buster goes here.</p>"
+            "label": "Under button text"
           },
           {
             "type": "color",
             "id": "under_text_color",
-            "label": "Font color",
+            "label": "Text font color",
             "default": "#A4A4A4"
           }, 
           {
@@ -2149,7 +2121,7 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "label": "Text desktop font size",
             "default": 14
           }, 
           {
@@ -2158,31 +2130,29 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "label": "Text mobile font size",
             "default": 14
           }, 
           {
-            "type": "range",
-            "id": "under_text_space",
-            "min": 0,
-            "max": 200,
-            "step": 2,
-            "label": "Bottom spacing",
-            "default": 12
-          },
-          {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block background image size",
             "default": "cover",
             "options": [
               {
@@ -2198,7 +2168,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -2218,7 +2188,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -2237,12 +2207,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -2251,7 +2221,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -2263,12 +2233,12 @@
         "settings": [
             {
                 "type": "header",
-                "content": "DISPLAY SETTINGS"
+                "content": "BLOCK DISPLAY SETTINGS"
               }, 
               {
                 "type": "select",
                 "id": "display_options",
-                "label": "Display option",
+                "label": "Block display settings",
                 "default": "bl-hide-none",
                 "options": [
                   {
@@ -2287,12 +2257,12 @@
               },
           {
             "type": "header",
-            "content": "CONTAINER STYLE"
+            "content": "BLOCK STYLE"
           },
           {
             "type": "select",
             "id": "text_align",
-            "label": "Text alignment",
+            "label": "Block text alignment",
             "default": "center",
             "options": [
               {
@@ -2315,7 +2285,7 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "label": "Block desktop padding",
             "default": 24
           }, 
           {
@@ -2324,7 +2294,7 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "label": "Block mobile padding",
             "default": 24
           }, 
           {
@@ -2334,7 +2304,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -2344,19 +2314,49 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
             "default": "#ffffff"
           },
           {
@@ -2366,13 +2366,12 @@
           {
             "type": "richtext",
             "id": "subheading",
-            "label": "Text",
-            "default": "<p>Subheading</p>"
+            "label": "Subheading text"
           },
           {
             "type": "color",
             "id": "subheading_color",
-            "label": "Font color",
+            "label": "Subheading font color",
             "default": "#000000"
           },
           {
@@ -2381,7 +2380,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Subheading desktop font size",
             "default": 14
           }, 
           {
@@ -2390,7 +2390,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Subheading mobile font size",
             "default": 14
           }, 
           {
@@ -2399,7 +2400,8 @@
             "min": 0,
             "max": 24,
             "step": 1,
-            "label": "Letter spacing",
+            "unit": "px",
+            "label": "Subheading letter spacing",
             "default": 1
           }, 
           {
@@ -2408,7 +2410,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Subheading bottom spacing",
             "default": 12
           }, 
           {
@@ -2418,14 +2421,14 @@
           {
             "type": "richtext",
             "id": "heading",
-            "label": "Text",
-            "default": "<p>ACCORDION BLOCK</p>",
+            "label": "Heading text",
+            "default": "<p>Accordion block</p>",
             "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Heading font color",
             "default": "#000000"
           },
           {
@@ -2434,7 +2437,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Heading desktop font size",
             "default": 36
           }, 
           {
@@ -2443,7 +2447,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Heading mobile font size",
             "default": 24
           }, 
           {
@@ -2452,7 +2457,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Heading bottom spacing",
             "default": 12
           },
           {
@@ -2462,13 +2468,12 @@
           {
             "type": "richtext",
             "id": "description",
-            "label": "Text",
-            "default": "<p></p>"
+            "label": "Description text"
           },
           {
             "type": "color",
             "id": "description_color",
-            "label": "Font color",
+            "label": "Description font color",
             "default": "#000000"
           },
           {
@@ -2477,7 +2482,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Description desktop font size",
             "default": 16
           }, 
           {
@@ -2486,7 +2492,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Description mobile font size",
             "default": 14
           }, 
           {
@@ -2495,17 +2502,18 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Description bottom spacing",
             "default": 12
           },
           {
             "type": "header",
-            "content": "ACCORDION SETTINGS"
+            "content": "ACCORDION QUESTION SETTINGS"
           },
           {
             "type": "color",
             "id": "accordion_color",
-            "label": "Accordion color",
+            "label": "Question font color",
             "default": "#000"
           },
           {
@@ -2514,7 +2522,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Question desktop font size",
             "default": 14
           }, 
           {
@@ -2523,7 +2532,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Question mobile font size",
             "default": 14
           },
           {
@@ -2532,29 +2542,30 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Accordion padding",
+            "unit": "px",
+            "label": "Question padding",
             "default": 16
           }, 
           {
             "type": "color",
             "id": "icon_accordion_color",
-            "label": "Icon color",
+            "label": "+ icon color",
             "default": "#000"
           },
           {
             "type": "color",
             "id": "border_accordion_color",
-            "label": "Border color",
+            "label": "Accordion border color",
             "default": "#000"
           },  
           {
             "type": "header",
-            "content": "PANEL SETTINGS"
+            "content": "ACCORDION ANSWER SETTINGS"
           },
           {
             "type": "color",
             "id": "panel_color",
-            "label": "Panel color",
+            "label": "Answer font color",
             "default": "#000"
           },
           {
@@ -2563,7 +2574,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Answer desktop font size",
             "default": 14
           }, 
           {
@@ -2572,98 +2584,106 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Answer mobile font size",
             "default": 14
           }, 
           {
             "type": "header",
-            "content": "ACCORDION TEXT"
+            "content": "ACCORDION QUESTION/ANSWER TEXT"
           },
           {
             "type": "text",
             "id": "accordion_1_text",
-            "label": "Accordion 1",
+            "label": "Question 1",
             "default": "Question is asked?"
           },
           {
             "type": "richtext",
             "id": "panel_1_text",
-            "label": "Panel 1",
+            "label": "Answer 1",
             "default": "<p>Answer goes here.</p>"
           },
           {
             "type": "text",
             "id": "accordion_2_text",
-            "label": "Accordion 2",
+            "label": "Question 2",
             "default": "Question is asked?"
           },
           {
             "type": "richtext",
             "id": "panel_2_text",
-            "label": "Panel 2",
+            "label": "Answer 2",
             "default": "<p>Answer goes here.</p>"
           },
           {
             "type": "text",
             "id": "accordion_3_text",
-            "label": "Accordion 3",
+            "label": "Question 3",
             "default": "Question is asked?"
           },
           {
             "type": "richtext",
             "id": "panel_3_text",
-            "label": "Panel 3",
+            "label": "Answer 3",
             "default": "<p>Answer goes here.</p>"
           },
           {
             "type": "text",
             "id": "accordion_4_text",
-            "label": "Accordion 4",
+            "label": "Question4",
             "default": "Question is asked?"
           },
           {
             "type": "richtext",
             "id": "panel_4_text",
-            "label": "Panel 4",
+            "label": "Answer 4",
             "default": "<p>Answer goes here.</p>"
           },
           {
             "type": "text",
             "id": "accordion_5_text",
-            "label": "Accordion 5",
+            "label": "Question 5",
             "default": "Question is asked?"
           },
           {
             "type": "richtext",
             "id": "panel_5_text",
-            "label": "Panel 5",
+            "label": "Answer 5",
             "default": "<p>Answer goes here.</p>"
           },
           {
             "type": "text",
             "id": "accordion_6_text",
-            "label": "Accordion 6",
+            "label": "Question 6",
             "default": "Question is asked?"
           },
           {
             "type": "richtext",
             "id": "panel_6_text",
-            "label": "Panel 6",
+            "label": "Answer 6",
             "default": "<p>Answer goes here.</p>"
           },         
           {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block background image size",
             "default": "cover",
             "options": [
               {
@@ -2679,7 +2699,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -2699,7 +2719,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -2718,12 +2738,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -2732,7 +2752,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -2744,12 +2764,12 @@
       "settings": [
         {
             "type": "header",
-            "content": "DISPLAY SETTINGS"
+            "content": "BLOCK DISPLAY SETTINGS"
           }, 
           {
             "type": "select",
             "id": "display_options",
-            "label": "Display option",
+            "label": "Block display settings",
             "default": "bl-hide-none",
             "options": [
               {
@@ -2768,12 +2788,12 @@
           },
           {
             "type": "header",
-            "content": "COLUMN STYLE"
+            "content": "BLOCK STYLE"
           },
           {
             "type": "select",
             "id": "text_align",
-            "label": "Text alignment",
+            "label": "Block text alignment",
             "default": "center",
             "options": [
               {
@@ -2796,7 +2816,7 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "label": "Block desktop padding",
             "default": 24
           }, 
           {
@@ -2805,7 +2825,7 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "label": "Block mobile padding",
             "default": 24
           }, 
           {
@@ -2815,7 +2835,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -2825,19 +2845,49 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
             "default": "#ffffff"
           },
           {
@@ -2847,12 +2897,13 @@
           {
             "type": "image_picker",
             "id": "img_image",
-            "label": "Icon"
+            "label": "Icon image",
+            "info": "Upload a png or jpg."
           }, 
           {
             "type": "color",
             "id": "img_overlay_color",
-            "label": "Overlay color",
+            "label": "Icon overlay color",
             "default": "#000000"
           },
           {
@@ -2861,7 +2912,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Icon overlay opacity",
             "default": 0
           },
           {
@@ -2871,7 +2922,7 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Icon border radius",
             "default": 5
           }, 
           {
@@ -2900,7 +2951,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Icon bottom spacing",
             "default": 12
           },
           {
@@ -2932,13 +2984,13 @@
           {
             "type": "richtext",
             "id": "subheading",
-            "label": "Text",
+            "label": "Subheading text",
             "default": "<p>Subheading</p>"
           },
           {
             "type": "color",
             "id": "subheading_color",
-            "label": "Font color",
+            "label": "Subheading font color",
             "default": "#000000"
           },
           {
@@ -2947,7 +2999,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Subheading desktop font size",
             "default": 14
           }, 
           {
@@ -2956,7 +3009,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Subheading mobile font size",
             "default": 14
           }, 
           {
@@ -2965,7 +3019,8 @@
             "min": 0,
             "max": 24,
             "step": 1,
-            "label": "Letter spacing",
+            "unit": "px",
+            "label": "Subheading letter spacing",
             "default": 1
           }, 
           {
@@ -2974,7 +3029,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Subheading bottom spacing",
             "default": 12
           }, 
           {
@@ -2984,14 +3040,14 @@
           {
             "type": "richtext",
             "id": "heading",
-            "label": "Text",
-            "default": "<p>ICON BLOCK</p>",
+            "label": "Heading text",
+            "default": "<p>Icon block</p>",
             "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Heading font color",
             "default": "#000000"
           },
           {
@@ -3000,7 +3056,7 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "label": "Heading desktop font size",
             "default": 36
           }, 
           {
@@ -3009,7 +3065,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Heading mobile font size",
             "default": 24
           }, 
           {
@@ -3018,7 +3075,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Heading bottom spacing",
             "default": 12
           },
           {
@@ -3028,13 +3086,13 @@
           {
             "type": "richtext",
             "id": "description",
-            "label": "Text",
+            "label": "Description text",
             "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
           },
           {
             "type": "color",
             "id": "description_color",
-            "label": "Font color",
+            "label": "Description font color",
             "default": "#000000"
           },
           {
@@ -3043,7 +3101,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Description desktop font size",
             "default": 16
           }, 
           {
@@ -3052,7 +3111,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Description mobile font size",
             "default": 14
           }, 
           {
@@ -3061,22 +3121,30 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Description bottom spacing",
             "default": 12
           },
           {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block background image size",
             "default": "cover",
             "options": [
               {
@@ -3092,7 +3160,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -3112,7 +3180,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -3131,12 +3199,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK BACKGROUND IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -3145,7 +3213,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -3157,12 +3225,12 @@
         "settings": [
             {
                 "type": "header",
-                "content": "DISPLAY SETTINGS"
+                "content": "BLOCK DISPLAY SETTINGS"
               }, 
               {
                 "type": "select",
                 "id": "display_options",
-                "label": "Display option",
+                "label": "Block display settings",
                 "default": "bl-hide-none",
                 "options": [
                   {
@@ -3181,12 +3249,12 @@
               },
           {
             "type": "header",
-            "content": "CONTAINER STYLE"
+            "content": "BLOCK STYLE"
           },
           {
             "type": "select",
             "id": "text_align",
-            "label": "Text alignment",
+            "label": "Block text alignment",
             "default": "center",
             "options": [
               {
@@ -3209,7 +3277,7 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "label": "Block desktop padding",
             "default": 24
           }, 
           {
@@ -3218,7 +3286,7 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "label": "Block mobile padding",
             "default": 24
           }, 
           {
@@ -3228,7 +3296,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -3238,19 +3306,49 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
             "default": "#ffffff"
           },
           {
@@ -3260,13 +3358,13 @@
           {
             "type": "richtext",
             "id": "subheading",
-            "label": "Text",
+            "label": "Subheading text",
             "default": "<p>Subheading</p>"
           },
           {
             "type": "color",
             "id": "subheading_color",
-            "label": "Font color",
+            "label": "Subheading font color",
             "default": "#000000"
           },
           {
@@ -3275,7 +3373,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Subheading desktop font size",
             "default": 14
           }, 
           {
@@ -3284,7 +3383,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Subheading mobile font size",
             "default": 14
           }, 
           {
@@ -3293,7 +3393,8 @@
             "min": 0,
             "max": 24,
             "step": 1,
-            "label": "Letter spacing",
+            "unit": "px",
+            "label": "Subheading letter spacing",
             "default": 1
           }, 
           {
@@ -3302,7 +3403,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Subheading bottom spacing",
             "default": 12
           }, 
           {
@@ -3312,14 +3414,14 @@
           {
             "type": "richtext",
             "id": "heading",
-            "label": "Text",
-            "default": "<p>STATS BLOCK</p>",
+            "label": "Heading text",
+            "default": "<p>Stats block</p>",
             "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Heading font color",
             "default": "#000000"
           },
           {
@@ -3328,7 +3430,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Heading desktop font size",
             "default": 36
           }, 
           {
@@ -3337,7 +3440,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Heading mobile font size",
             "default": 24
           }, 
           {
@@ -3346,7 +3450,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Heading bottom spacing",
             "default": 12
           },
           {
@@ -3356,13 +3461,13 @@
           {
             "type": "richtext",
             "id": "description",
-            "label": "Text",
+            "label": "Description text",
             "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
           },
           {
             "type": "color",
             "id": "description_color",
-            "label": "Font color",
+            "label": "Description font color",
             "default": "#000000"
           },
           {
@@ -3371,7 +3476,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Description desktop font size",
             "default": 16
           }, 
           {
@@ -3380,7 +3486,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Description mobile font size",
             "default": 14
           }, 
           {
@@ -3389,7 +3496,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Description bottom spacing",
             "default": 12
           },
           {
@@ -3405,7 +3513,7 @@
           {
             "type": "text",
             "id": "unit_1",
-            "label": "unit 1",
+            "label": "Unit 1",
             "default": "unit"
           },
           {
@@ -3417,7 +3525,7 @@
           {
             "type": "text",
             "id": "unit_2",
-            "label": "unit 2",
+            "label": "Unit 2",
             "default": "unit"
           },
           {
@@ -3429,7 +3537,7 @@
           {
             "type": "text",
             "id": "unit_3",
-            "label": "unit 3",
+            "label": "Unit 3",
             "default": "unit"
           },
           {
@@ -3448,7 +3556,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Stat desktop font size",
             "default": 32
           }, 
           {
@@ -3457,7 +3566,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Stat mobile font size",
             "default": 24
           }, 
           {
@@ -3476,7 +3586,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Unit desktop font size",
             "default": 24
           }, 
           {
@@ -3485,7 +3596,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Unit mobile font size",
             "default": 14
           }, 
           {
@@ -3520,22 +3632,30 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Gap",
+            "unit": "px",
+            "label": "Gap between stats",
             "default": 12
           },
           {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block background image size",
             "default": "cover",
             "options": [
               {
@@ -3551,7 +3671,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -3571,7 +3691,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -3590,12 +3710,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK BACKGROUND IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -3604,7 +3724,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -3616,12 +3736,12 @@
         "settings": [
             {
                 "type": "header",
-                "content": "DISPLAY SETTINGS"
+                "content": "BLOCK DISPLAY SETTINGS"
               }, 
               {
                 "type": "select",
                 "id": "display_options",
-                "label": "Display option",
+                "label": "Block display settings",
                 "default": "bl-hide-none",
                 "options": [
                   {
@@ -3640,12 +3760,12 @@
               },
           {
             "type": "header",
-            "content": "CONTAINER STYLE"
+            "content": "BLOCK STYLE"
           },
           {
             "type": "select",
             "id": "text_align",
-            "label": "Text alignment",
+            "label": "Block text alignment",
             "default": "center",
             "options": [
               {
@@ -3668,7 +3788,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "unit": "px",
+            "label": "Block desktop padding",
             "default": 24
           }, 
           {
@@ -3677,7 +3798,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "unit": "px",
+            "label": "Block mobile padding",
             "default": 24
           },  
           {
@@ -3687,7 +3809,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -3697,19 +3819,49 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
             "default": "#ffffff"
           },
           {
@@ -3719,13 +3871,12 @@
           {
             "type": "richtext",
             "id": "subheading",
-            "label": "Text",
-            "default": "<p></p>"
+            "label": "Subheading text"
           },
           {
             "type": "color",
             "id": "subheading_color",
-            "label": "Font color",
+            "label": "Subheading font color",
             "default": "#000000"
           },
           {
@@ -3734,7 +3885,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Subheading desktop font size",
             "default": 14
           }, 
           {
@@ -3743,7 +3895,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Subheading mobile font size",
             "default": 14
           }, 
           {
@@ -3752,7 +3905,8 @@
             "min": 0,
             "max": 24,
             "step": 1,
-            "label": "Letter spacing",
+            "unit": "px",
+            "label": "Subheading letter spacing",
             "default": 1
           }, 
           {
@@ -3761,7 +3915,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Subheading bottom spacing",
             "default": 12
           }, 
           {
@@ -3771,14 +3926,14 @@
           {
             "type": "richtext",
             "id": "heading",
-            "label": "Text",
-            "default": "<p>TOOLTIP BLOCK</p>",
+            "label": "Heading text",
+            "default": "<p>Tooltip block</p>",
             "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below."
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Heading font color",
             "default": "#000000"
           },
           {
@@ -3787,7 +3942,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Heading desktop font size",
             "default": 36
           }, 
           {
@@ -3796,7 +3952,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Heading mobile font size",
             "default": 24
           }, 
           {
@@ -3805,7 +3962,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Heading bottom spacing",
             "default": 12
           },
           {
@@ -3815,13 +3973,13 @@
           {
             "type": "richtext",
             "id": "description",
-            "label": "Text",
+            "label": "Description text",
             "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
           },
           {
             "type": "color",
             "id": "description_color",
-            "label": "Font color",
+            "label": "Description font color",
             "default": "#000000"
           },
           {
@@ -3830,7 +3988,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Description desktop font size",
             "default": 16
           }, 
           {
@@ -3839,7 +3998,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Description mobile font size",
             "default": 14
           }, 
           {
@@ -3848,7 +4008,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Description bottom spacing",
             "default": 12
           },
           {
@@ -3880,15 +4041,6 @@
             "default": "#FFFFFF"
           }, 
           {
-            "type": "range",
-            "id": "under_text_space",
-            "min": 0,
-            "max": 200,
-            "step": 2,
-            "label": "Bottom spacing",
-            "default": 12
-          },
-          {
             "type": "header",
             "content": "TOOLTIP ACCENTS"
           },
@@ -3912,17 +4064,24 @@
           }, 
           {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block image size",
             "default": "cover",
             "options": [
               {
@@ -3938,7 +4097,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -3958,7 +4117,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -3977,12 +4136,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK BACKGROUND IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -3991,7 +4150,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -4003,12 +4162,12 @@
         "settings": [
             {
                 "type": "header",
-                "content": "DISPLAY SETTINGS"
+                "content": "BLOCK DISPLAY SETTINGS"
               }, 
               {
                 "type": "select",
                 "id": "display_options",
-                "label": "Display option",
+                "label": "Block display settings",
                 "default": "bl-hide-none",
                 "options": [
                   {
@@ -4027,12 +4186,12 @@
               },
           {
             "type": "header",
-            "content": "ALIGNMENT"
+            "content": "BLOCK ALIGNMENT"
           },
           {
             "type": "select",
             "id": "text_align",
-            "label": "Text alignment",
+            "label": "Block text alignment",
             "default": "center",
             "options": [
               {
@@ -4083,7 +4242,7 @@
           }, 
           {
             "type": "header",
-            "content": "CONTAINER STYLE"
+            "content": "BLOCK STYLE"
           },
           {
             "type": "range",
@@ -4091,7 +4250,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "unit": "px",
+            "label": "Block desktop padding",
             "default": 24
           }, 
           {
@@ -4100,7 +4260,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "unit": "px",
+            "label": "Block mobile padding",
             "default": 24
           }, 
           {
@@ -4110,7 +4271,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -4120,19 +4281,49 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
             "default": "#ffffff"
           },
           {
@@ -4142,14 +4333,14 @@
           {
             "type": "richtext",
             "id": "heading",
-            "label": "Text",
-            "default": "<p>QUOTE BLOCK</p>",
+            "label": "Heading text",
+            "default": "<p>Quote block</p>",
             "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Heading font color",
             "default": "#000000"
           },
           {
@@ -4158,7 +4349,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Heading desktop font size",
             "default": 36
           }, 
           {
@@ -4167,7 +4359,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Heading mobile font size",
             "default": 24
           }, 
           {
@@ -4176,23 +4369,24 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Heading bottom spacing",
             "default": 12
           },
           {
             "type": "header",
-            "content": "QUOTE"
+            "content": "DESCRIPTION"
           },
           {
             "type": "richtext",
             "id": "description",
-            "label": "Text",
+            "label": "Description text",
             "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
           },
           {
             "type": "color",
             "id": "description_color",
-            "label": "Font color",
+            "label": "Description font color",
             "default": "#000000"
           },
           {
@@ -4201,7 +4395,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Description desktop font size",
             "default": 16
           }, 
           {
@@ -4210,7 +4405,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Description mobile font size",
             "default": 14
           }, 
           {
@@ -4219,22 +4415,23 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Description bottom spacing",
             "default": 12
           }, 
           {
             "type": "header",
-            "content": "REFERRER IMAGE"
+            "content": "PERSON IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "img_image",
-            "label": "Referrer Image"
+            "label": "Person image"
           }, 
           {
             "type": "color",
             "id": "img_overlay_color",
-            "label": "Overlay color",
+            "label": "Person imgae overlay color",
             "default": "#000000"
           },
           {
@@ -4243,7 +4440,8 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "unit": "px",
+            "label": "Person overlay opacity",
             "default": 0
           },
           {
@@ -4253,7 +4451,7 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Person image border radius",
             "default": 5
           }, 
           {
@@ -4263,7 +4461,7 @@
             "max": 600,
             "step": 10,
             "unit": "px",
-            "label": "Image desktop height",
+            "label": "Person image desktop height",
             "default": 50
           },
           {
@@ -4273,7 +4471,7 @@
             "max": 600,
             "step": 10,
             "unit": "px",
-            "label": "Image mobile height",
+            "label": "Person image mobile height",
             "default": 50
           },
           {
@@ -4283,13 +4481,13 @@
           {
             "type": "richtext",
             "id": "subheading",
-            "label": "Text",
+            "label": "Name text",
             "default": "<p>John Doe</p>"
           },
           {
             "type": "color",
             "id": "subheading_color",
-            "label": "Font color",
+            "label": "Name font color",
             "default": "#000000"
           },
           {
@@ -4298,7 +4496,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Name desktop font size",
             "default": 20
           }, 
           {
@@ -4307,7 +4506,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Name mobile font size",
             "default": 14
           }, 
           {
@@ -4316,7 +4516,8 @@
             "min": 0,
             "max": 24,
             "step": 1,
-            "label": "Letter spacing",
+            "unit": "px",
+            "label": "Name text letter spacing",
             "default": 1
           }, 
           {
@@ -4325,7 +4526,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Name text bottom spacing",
             "default": 0
           }, 
           {
@@ -4341,7 +4543,7 @@
           {
             "type": "color",
             "id": "company_text_color",
-            "label": "Font color",
+            "label": "Company font color",
             "default": "#A4A4A4"
           }, 
           {
@@ -4350,7 +4552,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Company desktop font size",
             "default": 14
           }, 
           {
@@ -4359,7 +4562,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Company mobile font size",
             "default": 14
           }, 
           {
@@ -4368,22 +4572,30 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Company text bottom spacing",
             "default": 0
           },
           {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block background image size",
             "default": "cover",
             "options": [
               {
@@ -4399,7 +4611,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -4419,7 +4631,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -4438,12 +4650,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK BACKGROUND IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -4452,7 +4664,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -4464,12 +4676,12 @@
         "settings": [
             {
                 "type": "header",
-                "content": "DISPLAY SETTINGS"
+                "content": "BLOCK DISPLAY SETTINGS"
               }, 
               {
                 "type": "select",
                 "id": "display_options",
-                "label": "Display option",
+                "label": "Block display settings",
                 "default": "bl-hide-none",
                 "options": [
                   {
@@ -4488,7 +4700,7 @@
               },
           {
             "type": "header",
-            "content": "CONTAINER STYLE"
+            "content": "BLOCK STYLE"
           },
           {
             "type": "range",
@@ -4496,7 +4708,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "unit": "px",
+            "label": "Block desktop padding",
             "default": 24
           }, 
           {
@@ -4505,7 +4718,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "unit": "px",
+            "label": "Block mobile padding",
             "default": 24
           }, 
           {
@@ -4515,7 +4729,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -4525,19 +4739,49 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
             "default": "#ffffff"
           },
           {
@@ -4547,13 +4791,13 @@
           {
             "type": "richtext",
             "id": "subheading",
-            "label": "Text",
+            "label": "Subheading text",
             "default": "<p>Subheading</p>"
           },
           {
             "type": "color",
             "id": "subheading_color",
-            "label": "Font color",
+            "label": "Subheading font color",
             "default": "#000000"
           },
           {
@@ -4562,7 +4806,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Subheading desktop font size",
             "default": 14
           }, 
           {
@@ -4571,7 +4816,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Subheading mobile font size",
             "default": 14
           }, 
           {
@@ -4580,7 +4826,8 @@
             "min": 0,
             "max": 24,
             "step": 1,
-            "label": "Letter spacing",
+            "unit": "px",
+            "label": "Subheading letter spacing",
             "default": 1
           }, 
           {
@@ -4589,7 +4836,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Subheading bottom spacing",
             "default": 12
           }, 
           {
@@ -4600,13 +4848,13 @@
             "type": "richtext",
             "id": "heading",
             "label": "Text",
-            "default": "<p>LIST BLOCK</p>",
+            "default": "<p>List block</p>",
             "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Heading font color",
             "default": "#000000"
           },
           {
@@ -4615,7 +4863,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Heading desktop font size",
             "default": 36
           }, 
           {
@@ -4624,7 +4873,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Heading mobile font size",
             "default": 24
           }, 
           {
@@ -4633,7 +4883,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Heading bottom spacing",
             "default": 12
           },
           {
@@ -4643,13 +4894,13 @@
           {
             "type": "richtext",
             "id": "description",
-            "label": "Text",
+            "label": "Description text",
             "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
           },
           {
             "type": "color",
             "id": "description_color",
-            "label": "Font color",
+            "label": "Description font color",
             "default": "#000000"
           },
           {
@@ -4658,7 +4909,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Description desktop font size",
             "default": 16
           }, 
           {
@@ -4667,7 +4919,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Description mobile font size",
             "default": 14
           }, 
           {
@@ -4676,7 +4929,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Description bottom spacing",
             "default": 12
           },
           {
@@ -4720,29 +4974,23 @@
           {
             "type": "text",
             "id": "btn_text",
-            "label": "Text",
+            "label": "Button text",
             "default": "Read More"
           }, {
             "type": "url",
             "id": "btn_link",
-            "label": "URL"
+            "label": "Button link"
           }, 
-          {
-            "type": "checkbox",
-            "id": "underline_show",
-            "label": "Show underline",
-            "default": false
-          },
           {
             "type": "color",
             "id": "btn_color",
-            "label": "Font color",
+            "label": "Button font color",
             "default": "#FAFAFA"
           },
           {
             "type": "color",
             "id": "btn_bg_color",
-            "label": "Background color",
+            "label": "Button background color",
             "default": "#008060"
           },
           {
@@ -4751,7 +4999,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Button desktop font size",
             "default": 16
           }, 
           {
@@ -4760,13 +5009,14 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Button mobile font size",
             "default": 14
           }, 
           {
             "type": "select",
             "id": "btn_size",
-            "label": "Button size",
+            "label": "Button style",
             "default": "bl-btn--md",
             "options": [
               {
@@ -4800,6 +5050,10 @@
               {
                 "value": "bl-btn--full-w-tall",
                 "label": "Full Width - Tall"
+              },
+              {
+                "value": "bl-btn--underline",
+                "label": "Underline"
               }
             ]
           }, 
@@ -4810,7 +5064,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Button border width",
             "default": 0
           }, 
           {
@@ -4820,13 +5074,13 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Button border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "btn_border_color",
-            "label": "Border color",
+            "label": "Button border color",
             "default": "#000000"
           },
           {
@@ -4835,7 +5089,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Button bottom spacing",
             "default": 12
           }, 
           {
@@ -4851,7 +5106,7 @@
           {
             "type": "color",
             "id": "under_text_color",
-            "label": "Font color",
+            "label": "Text font color",
             "default": "#A4A4A4"
           }, 
           {
@@ -4860,7 +5115,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Text desktop font size",
             "default": 14
           }, 
           {
@@ -4869,31 +5125,30 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Text mobile font size",
             "default": 14
           }, 
           {
-            "type": "range",
-            "id": "under_text_space",
-            "min": 0,
-            "max": 200,
-            "step": 2,
-            "label": "Bottom spacing",
-            "default": 12
-          },
-          {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block background image size",
             "default": "cover",
             "options": [
               {
@@ -4909,7 +5164,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -4929,7 +5184,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -4948,12 +5203,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK BACKGROUND IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -4962,7 +5217,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -4974,12 +5229,12 @@
         "settings": [
             {
                 "type": "header",
-                "content": "DISPLAY SETTINGS"
+                "content": "BLOCK DISPLAY SETTINGS"
               }, 
               {
                 "type": "select",
                 "id": "display_options",
-                "label": "Display option",
+                "label": "Block display settings",
                 "default": "bl-hide-none",
                 "options": [
                   {
@@ -4998,12 +5253,12 @@
               },
           {
             "type": "header",
-            "content": "CONTAINER STYLE"
+            "content": "BLOCK STYLE"
           },
           {
             "type": "select",
             "id": "text_align",
-            "label": "Text alignment",
+            "label": "Block text alignment",
             "default": "center",
             "options": [
               {
@@ -5026,7 +5281,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "unit": "px",
+            "label": "Block desktop padding",
             "default": 24
           }, 
           {
@@ -5035,7 +5291,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "unit": "px",
+            "label": "Block mobile padding",
             "default": 24
           }, 
           {
@@ -5044,7 +5301,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Vertical spacing around text",
+            "unit": "px",
+            "label": "Block vertical spacing around text",
             "default": 12
           }, 
           {
@@ -5053,7 +5311,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Horizontal spacing around text",
+            "unit": "px",
+            "label": "Block horizontal spacing around text",
             "default": 12
           }, 
           {
@@ -5063,7 +5322,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -5073,34 +5332,64 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
             "default": "#ffffff"
           },
           {
             "type": "header",
-            "content": "IMAGE"
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "FEATURED IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "img_image",
-            "label": "Image"
+            "label": "Featured image"
           }, 
           {
             "type": "color",
             "id": "img_overlay_color",
-            "label": "Overlay color",
+            "label": "Featured image overlay color",
             "default": "#000000"
           },
           {
@@ -5109,7 +5398,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Featured image overlay opacity",
             "default": 0
           },
           {
@@ -5119,12 +5408,12 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Featured image border radius",
             "default": 5
           }, 
           {
             "type": "header",
-            "content": "IMAGE HEIGHT"
+            "content": "FEATURED IMAGE HEIGHT"
           },
           {
             "type": "range",
@@ -5133,7 +5422,7 @@
             "max": 600,
             "step": 10,
             "unit": "px",
-            "label": "Image desktop height",
+            "label": "Featured image desktop height",
             "default": 350
           },
           {
@@ -5143,17 +5432,17 @@
             "max": 600,
             "step": 10,
             "unit": "px",
-            "label": "Image mobile height",
+            "label": "Featured image mobile height",
             "default": 350
           },
           {
             "type": "header",
-            "content": "IMAGE SIZE"
+            "content": "FEATURED IMAGE SIZE"
           },
           {
             "type": "select",
             "id": "img_image_size",
-            "label": "Image size",
+            "label": "Featured image size",
             "default": "cover",
             "options": [
               {
@@ -5169,7 +5458,7 @@
           {
             "type": "select",
             "id": "img_image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Featured image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -5189,7 +5478,7 @@
           {
             "type": "select",
             "id": "img_image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Featured image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -5213,13 +5502,13 @@
           {
             "type": "richtext",
             "id": "subheading",
-            "label": "Text",
+            "label": "Subheading text",
             "default": "<p>Subheading</p>"
           },
           {
             "type": "color",
             "id": "subheading_color",
-            "label": "Font color",
+            "label": "Subheading font color",
             "default": "#000000"
           },
           {
@@ -5228,7 +5517,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Subheading desktop font size",
             "default": 14
           }, 
           {
@@ -5237,7 +5527,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Subheading mobile font size",
             "default": 14
           }, 
           {
@@ -5246,7 +5537,8 @@
             "min": 0,
             "max": 24,
             "step": 1,
-            "label": "Letter spacing",
+            "unit": "px",
+            "label": "Subheading letter spacing",
             "default": 1
           }, 
           {
@@ -5255,7 +5547,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Subheading bottom spacing",
             "default": 12
           }, 
           {
@@ -5265,14 +5558,14 @@
           {
             "type": "richtext",
             "id": "heading",
-            "label": "Text",
-            "default": "<p>TEXT AND IMAGE BLOCK</p>",
+            "label": "Heading text",
+            "default": "<p>Text and image block</p>",
             "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Heading font color",
             "default": "#000000"
           },
           {
@@ -5281,7 +5574,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Heading desktop font size",
             "default": 36
           }, 
           {
@@ -5290,7 +5584,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Heading mobile font size",
             "default": 24
           }, 
           {
@@ -5299,7 +5594,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Heading bottom spacing",
             "default": 12
           },
           {
@@ -5309,13 +5605,13 @@
           {
             "type": "richtext",
             "id": "description",
-            "label": "Text",
+            "label": "Description text",
             "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
           },
           {
             "type": "color",
             "id": "description_color",
-            "label": "Font color",
+            "label": "Description font color",
             "default": "#000000"
           },
           {
@@ -5324,7 +5620,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Description desktop font size",
             "default": 16
           }, 
           {
@@ -5333,7 +5630,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Description mobile font size",
             "default": 14
           }, 
           {
@@ -5342,7 +5640,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Description bottom spacing",
             "default": 12
           },
           {
@@ -5352,29 +5651,23 @@
           {
             "type": "text",
             "id": "btn_text",
-            "label": "Text",
+            "label": "Button text",
             "default": "Read More"
           }, {
             "type": "url",
             "id": "btn_link",
-            "label": "URL"
+            "label": "Button link"
           }, 
-          {
-            "type": "checkbox",
-            "id": "underline_show",
-            "label": "Show underline",
-            "default": false
-          },
           {
             "type": "color",
             "id": "btn_color",
-            "label": "Font color",
+            "label": "Button font color",
             "default": "#FAFAFA"
           },
           {
             "type": "color",
             "id": "btn_bg_color",
-            "label": "Background color",
+            "label": "Button background color",
             "default": "#008060"
           },
           {
@@ -5383,7 +5676,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Button desktop font size",
             "default": 16
           }, 
           {
@@ -5392,7 +5686,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Button mobile font size",
             "default": 14
           }, 
           {
@@ -5432,6 +5727,10 @@
               {
                 "value": "bl-btn--full-w-tall",
                 "label": "Full Width - Tall"
+              },
+              {
+                "value": "bl-btn--underline",
+                "label": "Underline"
               }
             ]
           }, 
@@ -5442,7 +5741,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Button border width",
             "default": 0
           }, 
           {
@@ -5452,13 +5751,13 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Button border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "btn_border_color",
-            "label": "Border color",
+            "label": "Button border color",
             "default": "#000000"
           },
           {
@@ -5467,7 +5766,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Button bottom spacing",
             "default": 12
           }, 
           {
@@ -5483,7 +5783,7 @@
           {
             "type": "color",
             "id": "under_text_color",
-            "label": "Font color",
+            "label": "Text font color",
             "default": "#A4A4A4"
           }, 
           {
@@ -5492,7 +5792,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Text desktop font size",
             "default": 14
           }, 
           {
@@ -5501,31 +5802,30 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Text mobile font size",
             "default": 14
           }, 
           {
-            "type": "range",
-            "id": "under_text_space",
-            "min": 0,
-            "max": 200,
-            "step": 2,
-            "label": "Bottom spacing",
-            "default": 12
-          },
-          {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block background image size",
             "default": "cover",
             "options": [
               {
@@ -5541,7 +5841,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -5561,7 +5861,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -5580,12 +5880,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK BACKGROUND IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -5594,7 +5894,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -5611,16 +5911,16 @@
           {
             "type": "product",
             "id": "product_handle",
-            "label": "Product"
+            "label": "Choose product"
           },
           {
             "type": "header",
-            "content": "DISPLAY SETTINGS"
+            "content": "BLOCK DISPLAY SETTINGS"
           }, 
           {
             "type": "select",
             "id": "display_options",
-            "label": "Display option",
+            "label": "Block display settings",
             "default": "bl-hide-none",
             "options": [
               {
@@ -5639,12 +5939,12 @@
           },
           {
             "type": "header",
-            "content": "CONTAINER STYLE"
+            "content": "BLOCK STYLE"
           },
           {
             "type": "select",
             "id": "text_align",
-            "label": "Text alignment",
+            "label": "Block text alignment",
             "default": "center",
             "options": [
               {
@@ -5667,7 +5967,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "unit": "px",
+            "label": "Block desktop padding",
             "default": 24
           }, 
           {
@@ -5676,7 +5977,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "unit": "px",
+            "label": "Block mobile padding",
             "default": 24
           }, 
           {
@@ -5685,7 +5987,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Vertical spacing around text",
+            "unit": "px",
+            "label": "Block vertical spacing around text",
             "default": 12
           }, 
           {
@@ -5694,7 +5997,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Horizontal spacing around text",
+            "unit": "px",
+            "label": "Block horizontal spacing around text",
             "default": 12
           }, 
           {
@@ -5704,7 +6008,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -5714,29 +6018,59 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
             "default": "#ffffff"
           },
           {
             "type": "header",
-            "content": "IMAGE"
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "PRODUCT IMAGE"
           }, 
           {
             "type": "color",
             "id": "img_overlay_color",
-            "label": "Overlay color",
+            "label": "Product image overlay color",
             "default": "#000000"
           },
           {
@@ -5745,7 +6079,8 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "unit": "px",
+            "label": "Product image overlay opacity",
             "default": 0
           },
           {
@@ -5755,12 +6090,12 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Product image border radius",
             "default": 5
           }, 
           {
             "type": "header",
-            "content": "IMAGE HEIGHT"
+            "content": "PRODUCT IMAGE HEIGHT"
           },
           {
             "type": "range",
@@ -5769,7 +6104,7 @@
             "max": 600,
             "step": 10,
             "unit": "px",
-            "label": "Image desktop height",
+            "label": "Product image desktop height",
             "default": 350
           },
           {
@@ -5779,17 +6114,17 @@
             "max": 600,
             "step": 10,
             "unit": "px",
-            "label": "Image mobile height",
+            "label": "Product image mobile height",
             "default": 350
           },
           {
             "type": "header",
-            "content": "IMAGE SIZE"
+            "content": "PRODUCT IMAGE SIZE"
           },
           {
             "type": "select",
             "id": "img_image_size",
-            "label": "Image size",
+            "label": "Product image size",
             "default": "cover",
             "options": [
               {
@@ -5805,7 +6140,7 @@
           {
             "type": "select",
             "id": "img_image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Product image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -5825,7 +6160,7 @@
           {
             "type": "select",
             "id": "img_image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Product image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -5844,12 +6179,12 @@
           },
           {
             "type": "header",
-            "content": "HEADING"
+            "content": "PRODUCT TITLE"
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Product title font color",
             "default": "#000000"
           },
           {
@@ -5858,7 +6193,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Product title desktop font size",
             "default": 36
           }, 
           {
@@ -5867,7 +6203,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Product title mobile font size",
             "default": 24
           }, 
           {
@@ -5876,17 +6213,18 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Product title bottom spacing",
             "default": 12
           },
           {
             "type": "header",
-            "content": "PRICE"
+            "content": "PRODUCT PRICE"
           },
           {
             "type": "color",
             "id": "price_color",
-            "label": "Font color",
+            "label": "Price font color",
             "default": "#000000"
           },
           {
@@ -5895,7 +6233,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Price desktop font size",
             "default": 24
           }, 
           {
@@ -5904,7 +6243,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Price mobile font size",
             "default": 18
           }, 
           {
@@ -5913,7 +6253,8 @@
             "min": 0,
             "max": 24,
             "step": 1,
-            "label": "Price spacing",
+            "unit": "px",
+            "label": "Price letter spacing",
             "default": 1
           }, 
           {
@@ -5922,23 +6263,24 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Price bottom",
+            "unit": "px",
+            "label": "Price bottom spacing",
             "default": 12
           }, 
           {
             "type": "header",
-            "content": "DESCRIPTION"
+            "content": "PRODUCT DESCRIPTION"
           },
           {
             "type": "richtext",
             "id": "description",
-            "label": "Text",
+            "label": "Product description text",
             "default": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>"
           },
           {
             "type": "color",
             "id": "description_color",
-            "label": "Font color",
+            "label": "Product description font color",
             "default": "#000000"
           },
           {
@@ -5947,7 +6289,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Product description desktop font size",
             "default": 16
           }, 
           {
@@ -5956,7 +6299,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Product description mobile font size",
             "default": 14
           }, 
           {
@@ -5965,39 +6309,34 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Product description bottom spacing",
             "default": 12
           },
           {
             "type": "header",
-            "content": "BUTTON"
+            "content": "PRODUCT BUTTON"
           },
           {
             "type": "text",
             "id": "btn_text",
-            "label": "Text",
+            "label": "Product button text",
             "default": "Read More"
           }, {
             "type": "url",
             "id": "btn_link",
-            "label": "URL"
+            "label": "Product button link"
           }, 
-          {
-            "type": "checkbox",
-            "id": "underline_show",
-            "label": "Show underline",
-            "default": false
-          },
           {
             "type": "color",
             "id": "btn_color",
-            "label": "Font color",
+            "label": "Product button font color",
             "default": "#FAFAFA"
           },
           {
             "type": "color",
             "id": "btn_bg_color",
-            "label": "Background color",
+            "label": "Product button background color",
             "default": "#008060"
           },
           {
@@ -6006,7 +6345,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Product button desktop font size",
             "default": 16
           }, 
           {
@@ -6015,13 +6355,14 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Product button mobile font size",
             "default": 14
           }, 
           {
             "type": "select",
             "id": "btn_size",
-            "label": "Button size",
+            "label": "Product button size",
             "default": "bl-btn--md",
             "options": [
               {
@@ -6055,6 +6396,10 @@
               {
                 "value": "bl-btn--full-w-tall",
                 "label": "Full Width - Tall"
+              },
+              {
+                "value": "bl-btn--underline",
+                "label": "Underline"
               }
             ]
           }, 
@@ -6065,7 +6410,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Product button border width",
             "default": 0
           }, 
           {
@@ -6075,13 +6420,13 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Product button border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "btn_border_color",
-            "label": "Border color",
+            "label": "Product button border color",
             "default": "#000000"
           },
           {
@@ -6090,7 +6435,7 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "label": "Product button bottom spacing",
             "default": 12
           }, 
           {
@@ -6106,7 +6451,7 @@
           {
             "type": "color",
             "id": "under_text_color",
-            "label": "Font color",
+            "label": "Text font color",
             "default": "#A4A4A4"
           }, 
           {
@@ -6115,7 +6460,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Text desktop font size",
             "default": 14
           }, 
           {
@@ -6124,31 +6470,30 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Text mobile font size",
             "default": 14
           }, 
           {
-            "type": "range",
-            "id": "under_text_space",
-            "min": 0,
-            "max": 200,
-            "step": 2,
-            "label": "Bottom spacing",
-            "default": 12
-          },
-          {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block background image size",
             "default": "cover",
             "options": [
               {
@@ -6164,7 +6509,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -6184,7 +6529,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -6203,12 +6548,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK BACKGROUND IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -6217,7 +6562,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -6229,12 +6574,12 @@
         "settings": [
             {
                 "type": "header",
-                "content": "DISPLAY SETTINGS"
+                "content": "BLOCK DISPLAY SETTINGS"
               }, 
               {
                 "type": "select",
                 "id": "display_options",
-                "label": "Display option",
+                "label": "Block display settings",
                 "default": "bl-hide-none",
                 "options": [
                   {
@@ -6253,12 +6598,12 @@
               },
           {
             "type": "header",
-            "content": "CONTAINER STYLE"
+            "content": "BLOCK STYLE"
           },
           {
             "type": "select",
             "id": "text_align",
-            "label": "Text alignment",
+            "label": "Block text alignment",
             "default": "center",
             "options": [
               {
@@ -6281,7 +6626,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Desktop padding",
+            "unit": "px",
+            "label": "BLock desktop padding",
             "default": 24
           }, 
           {
@@ -6290,7 +6636,8 @@
             "min": 0,
             "max": 96,
             "step": 2,
-            "label": "Mobile padding",
+            "unit": "px",
+            "label": "Block mobile padding",
             "default": 24
           }, 
           {
@@ -6300,7 +6647,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Block border width",
             "default": 0
           }, 
           {
@@ -6310,19 +6657,49 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Block border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "border_color",
-            "label": "Border color",
+            "label": "Block border color",
             "default": "#000000"
           },
           {
             "type": "color",
             "id": "bg_color",
-            "label": "Background color",
+            "label": "Block background color",
+            "default": "#ffffff"
+          },
+          {
+            "type": "header",
+            "content": "COLUMN STYLE"
+          },
+          {
+            "type": "select",
+            "id": "alignment",
+            "label": "Column top/bottom alignment",
+            "default": "center",
+            "options": [
+              {
+                "value": "start",
+                "label": "Top"
+              }, 
+              {
+                "value": "center",
+                "label": "Center"
+              }, 
+              {
+                "value": "end",
+                "label": "Bottom"
+              }
+            ]
+          }, 
+          {
+            "type": "color",
+            "id": "bg_col_color",
+            "label": "Column background color",
             "default": "#ffffff"
           },
           {
@@ -6332,14 +6709,14 @@
           {
             "type": "richtext",
             "id": "heading",
-            "label": "Text",
-            "default": "<p>BUTTONS BLOCK</p>",
+            "label": "Heading text",
+            "default": "<p>Two button block</p>",
             "info": "Highlight one or two key words in your heading by italicizing them, then choose the highlight option below"
           },
           {
             "type": "color",
             "id": "heading_color",
-            "label": "Font color",
+            "label": "Heading font color",
             "default": "#000000"
           },
           {
@@ -6348,7 +6725,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Heading desktop font size",
             "default": 36
           }, 
           {
@@ -6357,7 +6735,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Heading mobile font size",
             "default": 24
           }, 
           {
@@ -6366,7 +6745,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Heading bottom spacing",
             "default": 12
           },
           {
@@ -6376,29 +6756,23 @@
           {
             "type": "text",
             "id": "btn_text",
-            "label": "Text",
+            "label": "First button text",
             "default": "Read More"
           }, {
             "type": "url",
             "id": "btn_link",
-            "label": "URL"
+            "label": "First button link"
           }, 
-          {
-            "type": "checkbox",
-            "id": "underline_show",
-            "label": "Show underline",
-            "default": false
-          },
           {
             "type": "color",
             "id": "btn_color",
-            "label": "Font color",
+            "label": "First button font color",
             "default": "#FAFAFA"
           },
           {
             "type": "color",
             "id": "btn_bg_color",
-            "label": "Background color",
+            "label": "First button background color",
             "default": "#008060"
           },
           {
@@ -6407,7 +6781,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "First button desktop font size",
             "default": 16
           }, 
           {
@@ -6416,13 +6791,14 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "First button mobile font size",
             "default": 14
           }, 
           {
             "type": "select",
             "id": "btn_size",
-            "label": "Button size",
+            "label": "First button style",
             "default": "bl-btn--md",
             "options": [
               {
@@ -6456,6 +6832,10 @@
               {
                 "value": "bl-btn--full-w-tall",
                 "label": "Full Width - Tall"
+              },
+              {
+                "value": "bl-btn--underline",
+                "label": "Underline"
               }
             ]
           }, 
@@ -6466,7 +6846,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "First button border width",
             "default": 0
           }, 
           {
@@ -6476,13 +6856,13 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "First button border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "btn_border_color",
-            "label": "Border color",
+            "label": "First button border color",
             "default": "#000000"
           },
           {
@@ -6491,7 +6871,7 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "label": "First button bottom spacing",
             "default": 12
           }, 
           {
@@ -6501,29 +6881,23 @@
           {
             "type": "text",
             "id": "btn_alt_text",
-            "label": "Text",
+            "label": "Second button text",
             "default": "Read More"
           }, {
             "type": "url",
             "id": "btn_alt_link",
-            "label": "URL"
+            "label": "Second button link"
           }, 
-          {
-            "type": "checkbox",
-            "id": "underline_alt_show",
-            "label": "Show underline",
-            "default": false
-          },
           {
             "type": "color",
             "id": "btn_alt_color",
-            "label": "Font color",
+            "label": "Second button font color",
             "default": "#FAFAFA"
           },
           {
             "type": "color",
             "id": "btn_alt_bg_color",
-            "label": "Background color",
+            "label": "Second button background color",
             "default": "#008060"
           },
           {
@@ -6532,7 +6906,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Second button desktop font size",
             "default": 16
           }, 
           {
@@ -6541,13 +6916,14 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Second button mobile font size",
             "default": 14
           }, 
           {
             "type": "select",
             "id": "btn_alt_size",
-            "label": "Button size",
+            "label": "Second button style",
             "default": "bl-btn--md",
             "options": [
               {
@@ -6581,6 +6957,10 @@
               {
                 "value": "bl-btn--full-w-tall",
                 "label": "Full Width - Tall"
+              },
+              {
+                "value": "bl-btn--underline",
+                "label": "Underline"
               }
             ]
           }, 
@@ -6591,7 +6971,7 @@
             "max": 10,
             "step": 1,
             "unit": "px",
-            "label": "Border width",
+            "label": "Second button border width",
             "default": 0
           }, 
           {
@@ -6601,13 +6981,13 @@
             "max": 100,
             "step": 1,
             "unit": "px",
-            "label": "Border radius",
+            "label": "Second button border radius",
             "default": 5
           }, 
           {
             "type": "color",
             "id": "btn_alt_border_color",
-            "label": "Border color",
+            "label": "Second button border color",
             "default": "#000000"
           },
           {
@@ -6616,7 +6996,8 @@
             "min": 0,
             "max": 200,
             "step": 2,
-            "label": "Bottom spacing",
+            "unit": "px",
+            "label": "Second button bottom spacing",
             "default": 12
           }, 
           {
@@ -6632,7 +7013,7 @@
           {
             "type": "color",
             "id": "under_text_color",
-            "label": "Font color",
+            "label": "Text font color",
             "default": "#A4A4A4"
           }, 
           {
@@ -6641,7 +7022,8 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Desktop font size",
+            "unit": "px",
+            "label": "Text desktop font size",
             "default": 14
           }, 
           {
@@ -6650,31 +7032,30 @@
             "min": 0,
             "max": 100,
             "step": 1,
-            "label": "Mobile font size",
+            "unit": "px",
+            "label": "Text mobile font size",
             "default": 14
           }, 
           {
-            "type": "range",
-            "id": "under_text_space",
-            "min": 0,
-            "max": 200,
-            "step": 2,
-            "label": "Bottom spacing",
-            "default": 12
-          },
-          {
             "type": "header",
-            "content": "BACKGROUND IMAGE"
+            "content": "BLOCK BACKGROUND IMAGE"
           }, 
           {
             "type": "image_picker",
             "id": "bg_image",
-            "label": "Background image"
+            "label": "Block background image"
           }, 
+          {
+            "type": "checkbox",
+            "id": "show_col_bg",
+            "label": "Column background image",
+            "default": false,
+            "info": "Use this configuration to show the image in the column background instead of the block background."
+          },
           {
             "type": "select",
             "id": "bg_image_size",
-            "label": "Image size",
+            "label": "Block background image size",
             "default": "cover",
             "options": [
               {
@@ -6690,7 +7071,7 @@
           {
             "type": "select",
             "id": "image_alignment_x",
-            "label": "Image horizontal alignment",
+            "label": "Block background image horizontal alignment",
             "default": "center",
             "options": [
               {
@@ -6710,7 +7091,7 @@
           {
             "type": "select",
             "id": "image_alignment_y",
-            "label": "Image vertical alignment",
+            "label": "Block background image vertical alignment",
             "default": "center",
             "options": [
               {
@@ -6729,12 +7110,12 @@
           }, 
           {
             "type": "header",
-            "content": "IMAGE OVERLAY"
+            "content": "BLOCK BACKGROUND IMAGE OVERLAY"
           }, 
           {
             "type": "color",
             "id": "overlay_color",
-            "label": "Overlay color",
+            "label": "Block background image overlay color",
             "default": "#000000"
           },
           {
@@ -6743,7 +7124,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
-            "label": "Overlay opacity",
+            "label": "Block background image overlay opacity",
             "default": 60
           }
         ]
@@ -6770,6 +7151,7 @@
             "min": 0,
             "max": 100,
             "step": 1,
+            "unit": "px",
             "label": "Vertical spacing",
             "default": 2
           },
@@ -6789,6 +7171,7 @@
             "min": 0,
             "max": 200,
             "step": 2,
+            "unit": "px",
             "label": "Top spacing",
             "default": 12
           },
@@ -6798,6 +7181,7 @@
             "min": 0,
             "max": 200,
             "step": 2,
+            "unit": "px",
             "label": "Bottom spacing",
             "default": 12
           },
@@ -6807,6 +7191,7 @@
             "min": 0,
             "max": 200,
             "step": 2,
+            "unit": "px",
             "label": "Left spacing",
             "default": 12
           },
@@ -6816,6 +7201,7 @@
             "min": 0,
             "max": 200,
             "step": 2,
+            "unit": "px",
             "label": "Right spacing",
             "default": 12
           },
@@ -6829,6 +7215,7 @@
             "min": 0,
             "max": 200,
             "step": 2,
+            "unit": "px",
             "label": "Top spacing",
             "default": 12
           },
@@ -6838,6 +7225,7 @@
             "min": 0,
             "max": 200,
             "step": 2,
+            "unit": "px",
             "label": "Bottom spacing",
             "default": 12
           },
@@ -6847,6 +7235,7 @@
             "min": 0,
             "max": 200,
             "step": 2,
+            "unit": "px",
             "label": "Left spacing",
             "default": 12
           },
@@ -6856,17 +7245,18 @@
             "min": 0,
             "max": 200,
             "step": 2,
+            "unit": "px",
             "label": "Right spacing",
             "default": 12
           },
           {
             "type": "header",
-            "content": "DISPLAY SETTINGS"
+            "content": "BLOCK DISPLAY SETTINGS"
           }, 
           {
             "type": "select",
             "id": "display_options",
-            "label": "Display option",
+            "label": "Block display settings",
             "default": "bl-hide-none",
             "options": [
               {
@@ -6892,12 +7282,12 @@
         "settings": [
             {
                 "type": "header",
-                "content": "DISPLAY SETTINGS"
+                "content": "BLOCK DISPLAY SETTINGS"
               }, 
               {
                 "type": "select",
                 "id": "display_options",
-                "label": "Display option",
+                "label": "Block display settings",
                 "default": "bl-hide-none",
                 "options": [
                   {
@@ -6927,6 +7317,13 @@
             "type": "header",
             "content": "IMAGE HEIGHT"
           }, 
+          {
+            "type": "checkbox",
+            "id": "img_full_height",
+            "label": "Force full height",
+            "default": false,
+            "info": "Check to override max height below."
+          },
           {
             "type": "range",
             "id": "desktop_img_height",
@@ -6963,6 +7360,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
+            "unit": "px",
             "label": "Overlay opacity",
             "default": 0
           },

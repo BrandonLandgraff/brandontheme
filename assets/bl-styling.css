@@ -1,6 +1,14 @@
 /* Building Blocks Theme Sections Styling */
 
 /* ----- BUILDING BLOCKS CSS ----- */
+/* TEXT CONTAINER */
+.bl-text-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 /* DESKTOP SECTION HEIGHT */
 @media only screen and (min-width: 768px){
     .height--150 {
@@ -181,6 +189,12 @@
         padding: 2px 12px;
       }
     }
+
+    .bl-btn--underline {
+        text-decoration: underline;
+        background-color: transparent !important;
+        border-width: 0px !important;
+    }
   
     /* DISPLAY SETTINGS */
     /* .bl-hide-none {} */
@@ -207,6 +221,10 @@
   
   .bl-grid {
     display: grid
+  }
+  
+  .bl-w-full {
+    width: 100%
   }
   
   .bl-px-4 {
