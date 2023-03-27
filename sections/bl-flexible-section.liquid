@@ -10,7 +10,85 @@
   assign bg_overlay = section.settings.opacity | divided_by: 100.00
 -%}
 
+{% comment %} PRIMARY BUTTON {% endcomment %}
+{%- liquid
+  assign buttoncolor1 = "#FAFAFA"
+  assign buttonbackgroundcolor1 = "#010101"
+  assign buttonbordercolor1 = "#010101"
+  assign buttonhovercolor1 = "#010101"
+  assign buttonbackgroundhovercolor1 = "#D7D7D7"
+  assign buttonborderhovercolor1 = "#010101"
+  assign buttonfontsize1 = 16
+  assign buttonmbfontsize1 = 14
+  assign buttoncornerradius1 = 4
+  assign buttonborderwidth1 = 1
+  assign buttoniconpicker1 = XXX
+  assign buttonanimation1 = XXX
+-%}
+
+{%- liquid
+  assign buttoncolor2 = "#010101"
+  assign buttonbackgroundcolor2 = "#D7D7D7"
+  assign buttonbordercolor2 = "#010101"
+  assign buttonhovercolor2 = "#FAFAFA"
+  assign buttonbackgroundhovercolor2 = "#010101"
+  assign buttonborderhovercolor2 = "#010101"
+  assign buttonfontsize2 = 16
+  assign buttonmbfontsize2 = 14
+  assign buttoncornerradius2 = 4
+  assign buttonborderwidth2 = 1
+  assign buttoniconpicker2 = XXX
+  assign buttonanimation2 = XXX
+-%}
+
 {%- style -%}
+/* PRIMARY BUTTON STYLE */
+.bl-btn-primary {
+  background-color: {{ buttonbackgroundcolor1 }};
+  color: {{ buttoncolor1 }};
+  border-width: {{ buttonborderwidth1 }}px;
+  border-style: solid;
+  border-color: {{ buttonbordercolor1 }};
+  font-size: {{ buttonfontsize1 }}px;
+  border-radius: {{ buttoncornerradius1 }}px;
+}
+
+@media only screen and (max-width: 768px) {
+  .bl-btn-primary {
+    font-size: {{ buttonmbfontsize1 }}px;
+  }
+}
+
+.bl-btn-primary:hover {
+  background-color: {{ buttonbackgroundhovercolor1 }};
+  color: {{ buttonhovercolor1 }};
+  border-color: {{ buttonborderhovercolor1 }};
+}
+
+/* SECONDARY BUTTON STYLE */
+.bl-btn-secondary {
+  background-color: {{ buttonbackgroundcolor2 }};
+  color: {{ buttoncolor2 }};
+  border-width: {{ buttonborderwidth2 }}px;
+  border-style: solid;
+  border-color: {{ buttonbordercolor2 }};
+  font-size: {{ buttonfontsize2 }}px;
+  border-radius: {{ buttoncornerradius2 }}px;
+}
+
+@media only screen and (max-width: 768px) {
+  .bl-btn-secondary {
+    font-size: {{ buttonmbfontsize2 }}px;
+  }
+}
+
+.bl-btn-secondary:hover {
+  background-color: {{ buttonbackgroundhovercolor2 }};
+  color: {{ buttonhovercolor2 }};
+  border-color: {{ buttonborderhovercolor2 }};
+}
+
+/* STYLES START */
   #bl-flexi-column-section--{{ sectionid }}{
     {%- if bg_color != 'rgba(0,0,0,0)' and bg_color != '' -%}
       background-color: {{ bg_color }};
@@ -74,9 +152,9 @@
     }
   }
 
-  .bl-blocks--{{ sectionid }} p {
+  /* .bl-blocks--{{ sectionid }} p {
     margin: 0px !important;
-  }
+  } */
 
   /* COLUMN ORDER */
   @media only screen and ( max-width: 768px ) {  
@@ -166,6 +244,65 @@
     }
   } */
 
+    /* METAFIELD CHANGES */
+    .bl--block p {
+    font-size: {% if shop.metafields.flexi.dtparagraph != blank %}{{ shop.metafields.flexi.dtparagraph }}{% else %}16{% endif %}px;
+  }
+
+  .bl--block h1 {
+    font-size: {% if shop.metafields.flexi.dtheading1 != blank %}{{ shop.metafields.flexi.dtheading1 }}{% else %}48{% endif %}px;
+  }
+
+  .bl--block h2 {
+    font-size: {% if shop.metafields.flexi.dtheading2 != blank %}{{ shop.metafields.flexi.dtheading2 }}{% else %}40{% endif %}px;
+  }
+
+  .bl--block h3 {
+    font-size: {% if shop.metafields.flexi.dtheading3 != blank %}{{ shop.metafields.flexi.dtheading3 }}{% else %}32{% endif %}px;
+  }
+
+  .bl--block h4 {
+    font-size: {% if shop.metafields.flexi.dtheading4 != blank %}{{ shop.metafields.flexi.dtheading4 }}{% else %}24{% endif %}px;
+  }
+
+  .bl--block h5 {
+    font-size: {% if shop.metafields.flexi.dtheading5 != blank %}{{ shop.metafields.flexi.dtheading5 }}{% else %}20{% endif %}px;
+  }
+
+  .bl--block h6 {
+    font-size: {% if shop.metafields.flexi.dtheading6 != blank %}{{ shop.metafields.flexi.dtheading6 }}{% else %}16{% endif %}px;
+  }
+
+  @media only screen and ( max-width: 768px ) {  
+    .bl--block p {
+      font-size: {% if shop.metafields.flexi.mbparagraph != blank %}{{ shop.metafields.flexi.mbparagraph }}{% else %}14{% endif %}px;
+    }
+
+    .bl--block h1 {
+      font-size: {% if shop.metafields.flexi.mbheading1 != blank %}{{ shop.metafields.flexi.mbheading1 }}{% else %}36{% endif %}px;
+    }
+
+    .bl--block h2 {
+      font-size: {% if shop.metafields.flexi.mbheading2 != blank %}{{ shop.metafields.flexi.mbheading2 }}{% else %}32{% endif %}px;
+    }
+
+    .bl--block h3 {
+      font-size: {% if shop.metafields.flexi.mbheading3 != blank %}{{ shop.metafields.flexi.mbheading3 }}{% else %}24{% endif %}px;
+    }
+
+    .bl--block h4 {
+      font-size: {% if shop.metafields.flexi.mbheading4 != blank %}{{ shop.metafields.flexi.mbheading4 }}{% else %}20{% endif %}px;
+    }
+
+    .bl--block h5 {
+      font-size: {% if shop.metafields.flexi.mbheading5 != blank %}{{ shop.metafields.flexi.mbheading5 }}{% else %}16{% endif %}px;
+    }
+
+    .bl--block h6 {
+      font-size: {% if shop.metafields.flexi.mbheading6 != blank %}{{ shop.metafields.flexi.mbheading6 }}{% else %}14{% endif %}px;
+    }
+  }
+
 {%- endstyle -%}
 
 <section
@@ -195,41 +332,9 @@
                 .bl--block-wrapper--{{ blockid }} {
                   padding: {{ block.settings.dt_column_padding }}px;
                 }
-                .bl--block-wrapper--{{ block.id }} .bl-subheading {
-                  font-size: {{ block.settings.dt_subheading_font_size }}px;
-                }
-                .bl--block-wrapper--{{ block.id }} .bl-heading {
-                  font-size: {{ block.settings.dt_heading_font_size }}px;
-                }
-                .bl--block-wrapper--{{ block.id }} .bl-description {
-                  font-size: {{ block.settings.dt_description_font_size }}px;
-                }
-                .bl--block-wrapper--{{ block.id }} .bl-btn {
-                  font-size: {{ block.settings.dt_btn_font_size }}px;
-                }
-                .bl--block-wrapper--{{ block.id }} .bl-under-text {
-                  font-size: {{ block.settings.dt_under_text_font_size }}px;
-                }
-
-
                 @media only screen and (max-width: 768px) {
                   .bl--block-wrapper--{{ blockid }} {
                     padding: {{ block.settings.mb_column_padding }}px;
-                  }
-                  .bl--block-wrapper--{{ block.id }} .bl-subheading {
-                    font-size: {{ block.settings.mb_subheading_font_size }}px;
-                  }
-                  .bl--block-wrapper--{{ block.id }} .bl-heading {
-                    font-size: {{ block.settings.mb_heading_font_size }}px;
-                  }
-                  .bl--block-wrapper--{{ block.id }} .bl-description {
-                    font-size: {{ block.settings.mb_description_font_size }}px;
-                  }
-                  .bl--block-wrapper--{{ block.id }} .bl-btn {
-                    font-size: {{ block.settings.mb_btn_font_size }}px;
-                  }
-                  .bl--block-wrapper--{{ block.id }} .bl-under-text {
-                    font-size: {{ block.settings.mb_under_text_font_size }}px;
                   }
                 }
                 {%- endstyle -%}
@@ -237,30 +342,27 @@
                 {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
 
                 <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; justify-content: {{ block.settings.justify_content }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
-                <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
-                  
+                  <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
+                    {% if block.settings.subheading != blank %}
+                      <{{ block.settings.subheading_text }} class="bl-subheading bl-{{ block.settings.subheading_text }}" style="color: {{ block.settings.subheading_color }}; margin: 0px 0px {{ block.settings.subheading_space }}px 0px;">{{ block.settings.subheading }}</{{ block.settings.subheading_text }}>
+                    {% endif %}
 
-                  
-                  {% if block.settings.subheading != blank %}
-                    <{{ block.settings.subheading_text }} class="bl-subheading bl-{{ block.settings.subheading_text }}" style="color: {{ block.settings.subheading_color }}; letter-spacing: {{ block.settings.subheading_letter }}px; margin: 0px 0px {{ block.settings.subheading_space }}px 0px;">{{ block.settings.subheading }}</{{ block.settings.subheading_text }}>
-                  {% endif %}
+                    {% if block.settings.heading != blank %}
+                      <{{ block.settings.heading_text }} class="bl-heading" style="color: {{ block.settings.heading_color }}; margin: 0px 0px  {{ block.settings.heading_space }}px 0px;">{{ block.settings.heading }}</{{ block.settings.heading_text }}>
+                    {% endif %}
 
-                  {% if block.settings.heading != blank %}
-                    <h2 class="bl-heading" style="color: {{ block.settings.heading_color }}; margin: 0px 0px  {{ block.settings.heading_space }}px 0px;">{{ block.settings.heading }}</h2>
-                  {% endif %}
+                    {% if block.settings.description != blank %}
+                      <div class="bl-description" style="color: {{ block.settings.description_color }};  margin: 0px 0px {{ block.settings.description_space }}px 0px; max-width: {{ block.settings.description_max_width }}px;">{{ block.settings.description }}</div>
+                    {% endif %}
 
-                  {% if block.settings.description != blank %}
-                    <div class="bl-description" style="color: {{ block.settings.description_color }};  margin: 0px 0px {{ block.settings.description_space }}px 0px; max-width: {{ block.settings.description_max_width }}px;">{{ block.settings.description }}</div>
-                  {% endif %}
+                    {% if block.settings.btn_text != blank %}
+                      <a class="bl-btn {{ block.settings.btn_size }}  {{ block.settings.btn_style }}" style="margin: 0px 0px {{ block.settings.btn_space }}px 0px;" href="{{ block.settings.btn_link }}">{{ block.settings.btn_text }}</a>
+                    {% endif %}
 
-                  {% if block.settings.btn_text != blank %}
-                    <a class="bl-btn {{ block.settings.btn_size }}" href="{{ block.settings.btn_link }}" style="color: {{ block.settings.btn_color }}; background-color: {{ block.settings.btn_bg_color }}; border-style: solid; border-width: {{ block.settings.btn_border_width }}px; border-radius: {{ block.settings.btn_border_radius }}px; border-color: {{ block.settings.btn_border_color }};  margin: 0px 0px {{ block.settings.btn_space }}px 0px; {% if block.settings.underline_show %} text-decoration: underline; {% endif %}">{{ block.settings.btn_text }}</a>
-                  {% endif %}
-
-                  {% if block.settings.under_text != blank %}
-                    <div class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px;">{{ block.settings.under_text }}</div>
-                  {% endif %}
-                </div>
+                    {% if block.settings.under_text != blank %}
+                      <{{ block.settings.under_text }} class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px;">{{ block.settings.under }}</{{ block.settings.under_text }}>
+                    {% endif %}
+                  </div>
               </div>
 
               {% comment %} ACCORDION BLOCK {% endcomment %}
@@ -1621,7 +1723,7 @@
       }, 
       {
         "type": "header",
-        "content": "SECTION DESKTOP PADDING"
+        "content": "DESKTOP SECTION PADDING"
       }, 
       {
         "type": "range",
@@ -1663,7 +1765,7 @@
       }, 
       {
         "type": "header",
-        "content": "SECTION MOBILE PADDING"
+        "content": "MOBILE SECTION PADDING"
       },
       {
         "type": "range",
@@ -1710,7 +1812,7 @@
       {
         "type": "select",
         "id": "first_order",
-        "label": "First column order",
+        "label": "First block order",
         "default": "",
         "options": [
           {
@@ -1738,7 +1840,7 @@
       {
         "type": "select",
         "id": "second_order",
-        "label": "Second column order",
+        "label": "Second block order",
         "default": "",
         "options": [
           {
@@ -1766,7 +1868,7 @@
       {
         "type": "select",
         "id": "third_order",
-        "label": "Third column order",
+        "label": "Third block order",
         "default": "",
         "options": [
           {
@@ -1794,7 +1896,7 @@
       {
         "type": "select",
         "id": "fourth_order",
-        "label": "Fourth column order",
+        "label": "Fourth block order",
         "default": "",
         "options": [
           {
@@ -1856,7 +1958,7 @@
         "settings": [
           {
             "type": "header",
-            "content": "Text Alignment"
+            "content": "Alignment & Positioning"
           },
           {
             "type": "select",
@@ -1961,7 +2063,7 @@
                 "label": "Heading 6"
               }
             ],
-            "default": "h4"
+            "default": "h5"
           },
           {
             "type": "color",
@@ -1988,12 +2090,6 @@
             "id": "heading",
             "label": "Heading text",
             "default": "Text block"
-          },
-          {
-            "type": "color",
-            "id": "heading_color",
-            "label": "Heading font color",
-            "default": "#000000"
           },
           {
             "type": "select",
@@ -2029,7 +2125,13 @@
                 "label": "Heading 6"
               }
             ],
-            "default": "h4"
+            "default": "h2"
+          },
+          {
+            "type": "color",
+            "id": "heading_color",
+            "label": "Heading font color",
+            "default": "#000000"
           },
           {
             "type": "range",
@@ -2069,26 +2171,6 @@
           },
           {
             "type": "range",
-            "id": "dt_description_font_size",
-            "min": 0,
-            "max": 100,
-            "step": 1,
-            "unit": "px",
-            "label": "Description desktop font size",
-            "default": 16
-          }, 
-          {
-            "type": "range",
-            "id": "mb_description_font_size",
-            "min": 0,
-            "max": 100,
-            "step": 1,
-            "unit": "px",
-            "label": "Description mobile font size",
-            "default": 14
-          }, 
-          {
-            "type": "range",
             "id": "description_space",
             "min": 0,
             "max": 200,
@@ -2113,41 +2195,25 @@
             "label": "Button link"
           }, 
           {
-            "type": "color",
-            "id": "btn_color",
-            "label": "Button font color",
-            "default": "#FAFAFA"
-          },
-          {
-            "type": "color",
-            "id": "btn_bg_color",
-            "label": "Button background color",
-            "default": "#008060"
-          },
-          {
-            "type": "range",
-            "id": "dt_btn_font_size",
-            "min": 0,
-            "max": 100,
-            "step": 1,
-            "unit": "px",
-            "label": "Button desktop font size",
-            "default": 16
-          }, 
-          {
-            "type": "range",
-            "id": "mb_btn_font_size",
-            "min": 0,
-            "max": 100,
-            "step": 1,
-            "unit": "px",
-            "label": "Button mobile font size",
-            "default": 14
+            "type": "select",
+            "id": "btn_style",
+            "label": "Button style",
+            "default": "bl-btn-primary",
+            "options": [
+              {
+                "value": "bl-btn-primary",
+                "label": "Primary Button"
+              }, 
+              {
+                "value": "bl-btn-secondary",
+                "label": "Secondary Button"
+              }
+            ]
           }, 
           {
             "type": "select",
             "id": "btn_size",
-            "label": "Button style",
+            "label": "Button size",
             "default": "bl-btn--md",
             "options": [
               {
@@ -2181,39 +2247,9 @@
               {
                 "value": "bl-btn--full-w-tall",
                 "label": "Full Width - Tall"
-              },
-              {
-                "value": "bl-btn--underline",
-                "label": "Underline"
               }
             ]
           }, 
-          {
-            "type": "range",
-            "id": "btn_border_width",
-            "min": 0,
-            "max": 10,
-            "step": 1,
-            "unit": "px",
-            "label": "Button border width",
-            "default": 0
-          }, 
-          {
-            "type": "range",
-            "id": "btn_border_radius",
-            "min": 0,
-            "max": 100,
-            "step": 1,
-            "unit": "px",
-            "label": "Button border radius",
-            "default": 5
-          }, 
-          {
-            "type": "color",
-            "id": "btn_border_color",
-            "label": "Button border color",
-            "default": "#000000"
-          },
           {
             "type": "range",
             "id": "btn_space",
@@ -2229,33 +2265,51 @@
             "content": "UNDER BUTTON TEXT"
           },
           {
-            "type": "richtext",
-            "id": "under_text",
+            "type": "text",
+            "id": "under",
             "label": "Under button text"
+          },
+          {
+            "type": "select",
+            "id": "under_text",
+            "label": "Text Option",
+            "options": [
+              {
+                "value": "p",
+                "label": "Paragraph"
+              },
+              {
+                "value": "h1",
+                "label": "Heading 1"
+              },
+              {
+                "value": "h2",
+                "label": "Heading 2"
+              },
+              {
+                "value": "h3",
+                "label": "Heading 3"
+              },
+              {
+                "value": "h4",
+                "label": "Heading 4"
+              },
+              {
+                "value": "h5",
+                "label": "Heading 5"
+              },
+              {
+                "value": "h6",
+                "label": "Heading 6"
+              }
+            ],
+            "default": "h6"
           },
           {
             "type": "color",
             "id": "under_text_color",
             "label": "Text font color",
             "default": "#A4A4A4"
-          }, 
-          {
-            "type": "range",
-            "id": "dt_under_text_font_size",
-            "min": 0,
-            "max": 100,
-            "step": 1,
-            "label": "Text desktop font size",
-            "default": 14
-          }, 
-          {
-            "type": "range",
-            "id": "mb_under_text_font_size",
-            "min": 0,
-            "max": 100,
-            "step": 1,
-            "label": "Text mobile font size",
-            "default": 14
           }, 
           {
             "type": "header",
@@ -2269,7 +2323,7 @@
           {
             "type": "checkbox",
             "id": "show_col_bg",
-            "label": "Force image to cover the entire column",
+            "label": "Force image to fill the entire column",
             "default": false
           },
           {
@@ -2344,6 +2398,7 @@
             "min": 0,
             "max": 100,
             "step": 5,
+            "unit": "%",
             "label": "Background image overlay opacity",
             "default": 60
           },
@@ -2411,7 +2466,7 @@
             "step": 2,
             "unit": "px",
             "label": "Block mobile padding",
-            "default": 24
+            "default": 0
           }, 
           {
             "type": "header",
@@ -5263,10 +5318,6 @@
               {
                 "value": "bl-btn--full-w-tall",
                 "label": "Full Width - Tall"
-              },
-              {
-                "value": "bl-btn--underline",
-                "label": "Underline"
               }
             ]
           }, 

@@ -123,10 +123,6 @@
       transition-duration: 0.4s;
     }
   
-    .bl-btn:hover {
-      opacity: 0.7;
-    }
-  
     /* BUTTON STYLES */
     .bl-btn--full-w-tall {
       text-align: center !important;
