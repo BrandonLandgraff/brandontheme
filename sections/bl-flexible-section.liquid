@@ -41,6 +41,30 @@
   assign buttonanimation2 = XXX
 -%}
 
+{%- liquid
+  assign linkcolor1 = "#010101"
+  assign linkbordercolor1 = "#010101"
+  assign linkhovercolor1 = "#010101"
+  assign linkborderhovercolor1 = "#010101"
+  assign linkfontsize1 = 16
+  assign linkmbfontsize1 = 14
+  assign linkborderwidth1 = 1
+  assign linkiconpicker1 = XXX
+  assign linkanimation1 = XXX
+-%}
+
+{%- liquid
+  assign linkcolor2 = "#010101"
+  assign linkbordercolor2 = "#010101"
+  assign linkhovercolor2 = "#010101"
+  assign linkborderhovercolor2 = "#010101"
+  assign linkfontsize2 = 16
+  assign linkmbfontsize2 = 14
+  assign linkborderwidth2 = 1
+  assign linkiconpicker2 = XXX
+  assign linkanimation2 = XXX
+-%}
+
 {%- style -%}
 /* PRIMARY BUTTON STYLE */
 .bl-btn-primary {
@@ -65,6 +89,26 @@
   border-color: {{ buttonborderhovercolor1 }};
 }
 
+/* PRIMARY LINK STYLE */
+.bl-link-primary {
+  color: {{ linkcolor1 }};
+  text-decoration-thickness: {{ linkborderwidth1 }}px;
+  text-decoration-line: underline;
+  text-decoration-color: {{ linkbordercolor1 }};
+  font-size: {{ linkfontsize1 }}px;
+}
+
+@media only screen and (max-width: 768px) {
+  .bl-link-primary {
+    font-size: {{ linkmbfontsize1 }}px;
+  }
+}
+
+.bl-link-primary:hover {
+  color: {{ linkhovercolor1 }};
+  border-color: {{ linkborderhovercolor1 }};
+}
+
 /* SECONDARY BUTTON STYLE */
 .bl-btn-secondary {
   background-color: {{ buttonbackgroundcolor2 }};
@@ -86,6 +130,26 @@
   background-color: {{ buttonbackgroundhovercolor2 }};
   color: {{ buttonhovercolor2 }};
   border-color: {{ buttonborderhovercolor2 }};
+}
+
+/* SECONDARY LINK STYLE */
+.bl-link-secondary {
+  color: {{ linkcolor2 }};
+  text-decoration-thickness: {{ linkborderwidth2 }}px;
+  text-decoration-line: underline;
+  text-decoration-color: {{ linkbordercolor2 }};
+  font-size: {{ linkfontsize2 }}px;
+}
+
+@media only screen and (max-width: 768px) {
+  .bl-link-secondary {
+    font-size: {{ linkmbfontsize2 }}px;
+  }
+}
+
+.bl-link-secondary:hover {
+  color: {{ linkhovercolor2 }};
+  text-decoration-color: {{ linkborderhovercolor2 }};
 }
 
 /* STYLES START */
@@ -427,7 +491,8 @@
                   }
                 }
 
-                .bl-accordion {
+                /* .bl-accordion {
+                  box-sizing: border-box;
                   background-color: transparent;
                   cursor: pointer;
                   padding: {{ block.settings.accordion_column_padding }}px;
@@ -469,6 +534,115 @@
 
                 .bl-panel p {
                   padding-bottom: {{ block.settings.accordion_column_padding }}px;
+                } */
+
+                /* NEW STYLES */
+                .bl-accordion-wrapper {
+                  box-sizing: border-box;
+                  width: 100%;
+                  min-height: 100%;
+                  display: flex;
+                  justify-content: center;
+                  align-items: flex-start;
+                }
+                .accordion {
+                  box-sizing: border-box;
+                }
+                .accordion-item {
+                  background-color: transparent;
+                  border-radius: 5px;
+                  transition: background-color 0.2s ease-in 0.3s;
+                }
+                /* .accordion-item.active {
+                  background-color: white;
+                  transition: background-color 0.2s ease-in 0s;
+                } */
+                .accordion-item.active .accordion-header {
+                  color: black;
+                  transition: background-color 0.2s ease-in 0s, color 0.2s ease-in 0.2s;
+                }
+                .accordion-item.active .accordion-header h2:before, .accordion-item.active .accordion-header h2:after {
+                  background-color: black;
+                  transition: background-color 0.2s ease-in 0.2s, transform 0.2s ease 0.1s;
+                }
+                .accordion-item.active .accordion-header h2:before {
+                  display: none;
+                }
+                .accordion-item.active .accordion-header h2:after {
+                  transform: rotate(90deg);
+                }
+                .accordion-item.active .accordion-body {
+                  max-height: 900px;
+                  padding: 0 15px 15px;
+                  transition: max-height 0.3s ease-in 0s, padding 0.2s ease-in 0s;
+                }
+                .accordion-item.active .accordion-body p {
+                  opacity: 1;
+                  transition: opacity 0.2s ease-in 0.2s;
+                }
+                .accordion-header {
+                  color: white;
+                  padding: 25px 15px;
+                  cursor: pointer;
+                  transition: background-color 0.2s ease-out 0.3s, color 0.2s ease-out 0s;
+                  border-top: 1px solid black;
+                }
+                .accordion-header h2 {
+                  text-align: left;
+                  position: relative;
+                  font-size: 1rem;
+                  font-weight: 500;
+                  letter-spacing: 0.025em;
+                  margin: 0;
+                }
+                .accordion-header h2:before, .accordion-header h2:after {
+                  content: "";
+                  position: absolute;
+                  background-color: white;
+                  transition: background-color 0.2s ease-in 0s, transform 0.2s ease 0s;
+                }
+                .accordion-header h2:before {
+                  width: 10px;
+                  height: 2px;
+                  right: 0;
+                  top: calc(50% - 1px);
+                }
+                .accordion-header h2:after {
+                  width: 2px;
+                  height: 10px;
+                  right: 4px;
+                  top: calc(50% - 5px);
+                  transform: none;
+                }
+                .accordion-body {
+                  max-height: 0;
+                  padding: 0 15px;
+                  overflow: hidden;
+                  transition: max-height 0.2s ease-out 0s, padding 0.1s ease-out 0.2s;
+                }
+                .accordion-item:last-child .accordion-body {
+                  border-bottom: 1px solid black;
+                }
+                .accordion-body p {
+                  font-size: 0.875rem;
+                  line-height: 1.6;
+                  opacity: 0;
+                  margin: 0;
+                  transition: opacity 0.2s ease-in 0s;
+                }
+
+                .credits {
+                  position: absolute;
+                  bottom: 30px;
+                  right: 30px;
+                  font-size: 14px;
+                }
+                .credits p {
+                  color: #94a2e6;
+                  margin: 0;
+                }
+                .credits a {
+                  color: white;
                 }
                 {%- endstyle -%}
                 {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
@@ -483,75 +657,84 @@
                     <h2 class="bl-heading" style="color: {{ block.settings.heading_color }}; margin: 0px 0px  {{ block.settings.heading_space }}px 0px;">{{ block.settings.heading }}</h2>
                   {% endif %}
 
-                  {% if block.settings.description != blank %}
-                    <div class="bl-description" style="color: {{ block.settings.description_color }};  margin: 0px 0px {{ block.settings.description_space }}px 0px;">{{ block.settings.description }}</div>
-                  {% endif %}
+                  <div class="bl-accordion-wrapper">
+                    <div class="accordion">
 
-                  {% comment %} ACCORDION 1 {% endcomment %}
-                  {% if block.settings.accordion_1_text != blank %}
-                    <button class="bl-accordion" style="color: {{ block.settings.accordion_color }};">{{ block.settings.accordion_1_text }}</button>
-                  {% endif %}
+                      {% comment %} ACCORDION 1 {% endcomment %}
+                      {% if block.settings.accordion_1_text != blank %}
+                        <div class="accordion-item">
+                          <div class="accordion-header">
+                            <h2>Lorem ipsum dolor sit amet 1</h2>
+                          </div>
+                          <div class="accordion-body">
+                            <p>1 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                          </div>
+                        </div>
+                      {% endif %}
 
-                  {% if block.settings.panel_1_text != blank %}
-                    <div class="bl-panel" style="color: {{ block.settings.panel_color }};">
-                      {{ block.settings.panel_1_text }}
+                      {% comment %} ACCORDION 2 {% endcomment %}
+                      {% if block.settings.accordion_2_text != blank %}
+                        <div class="accordion-item">
+                          <div class="accordion-header">
+                            <h2>Lorem ipsum dolor sit amet 2</h2>
+                          </div>
+                          <div class="accordion-body">
+                            <p>2 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                          </div>
+                        </div>
+                      {% endif %}
+
+                      {% comment %} ACCORDION 3 {% endcomment %}
+                      {% if block.settings.accordion_3_text != blank %}
+                        <div class="accordion-item">
+                          <div class="accordion-header">
+                            <h2>Lorem ipsum dolor sit amet 3</h2>
+                          </div>
+                          <div class="accordion-body">
+                            <p>3 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                          </div>
+                        </div>
+                      {% endif %}
+
+                      {% comment %} ACCORDION 4 {% endcomment %}
+                      {% if block.settings.accordion_4_text != blank %}
+                        <div class="accordion-item">
+                          <div class="accordion-header">
+                            <h2>Lorem ipsum dolor sit amet 3</h2>
+                          </div>
+                          <div class="accordion-body">
+                            <p>3 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                          </div>
+                        </div>
+                      {% endif %}
+
+                      {% comment %} ACCORDION 5 {% endcomment %}
+                      {% if block.settings.accordion_5_text != blank %}
+                        <div class="accordion-item">
+                          <div class="accordion-header">
+                            <h2>Lorem ipsum dolor sit amet 3</h2>
+                          </div>
+                          <div class="accordion-body">
+                            <p>3 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                          </div>
+                        </div>
+                      {% endif %}
+
+                      {% comment %} ACCORDION 6 {% endcomment %}
+                      {% if block.settings.accordion_6_text != blank %}
+                        <div class="accordion-item">
+                          <div class="accordion-header">
+                            <h2>Lorem ipsum dolor sit amet 3</h2>
+                          </div>
+                          <div class="accordion-body">
+                            <p>3 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                          </div>
+                        </div>
+                      {% endif %}
+                      
+                    
                     </div>
-                  {% endif %}
-
-                  {% comment %} ACCORDION 2 {% endcomment %}
-                  {% if block.settings.accordion_2_text != blank %}
-                    <button class="bl-accordion" style="color: {{ block.settings.accordion_color }};">{{ block.settings.accordion_2_text }}</button>
-                  {% endif %}
-
-                  {% if block.settings.panel_2_text != blank %}
-                    <div class="bl-panel" style="color: {{ block.settings.panel_color }};">
-                      {{ block.settings.panel_2_text }}
-                    </div>
-                  {% endif %}
-
-                  {% comment %} ACCORDION 3 {% endcomment %}
-                  {% if block.settings.accordion_3_text != blank %}
-                    <button class="bl-accordion" style="color: {{ block.settings.accordion_color }};">{{ block.settings.accordion_3_text }}</button>
-                  {% endif %}
-
-                  {% if block.settings.panel_3_text != blank %}
-                    <div class="bl-panel" style="color: {{ block.settings.panel_color }};">
-                      {{ block.settings.panel_3_text }}
-                    </div>
-                  {% endif %}
-
-                  {% comment %} ACCORDION 4 {% endcomment %}
-                  {% if block.settings.accordion_4_text != blank %}
-                    <button class="bl-accordion" style="color: {{ block.settings.accordion_color }};">{{ block.settings.accordion_4_text }}</button>
-                  {% endif %}
-
-                  {% if block.settings.panel_4_text != blank %}
-                    <div class="bl-panel" style="color: {{ block.settings.panel_color }};">
-                      {{ block.settings.panel_4_text }}
-                    </div>
-                  {% endif %}
-
-                  {% comment %} ACCORDION 5 {% endcomment %}
-                  {% if block.settings.accordion_5_text != blank %}
-                    <button class="bl-accordion" style="color: {{ block.settings.accordion_color }};">{{ block.settings.accordion_5_text }}</button>
-                  {% endif %}
-
-                  {% if block.settings.panel_5_text != blank %}
-                    <div class="bl-panel" style="color: {{ block.settings.panel_color }};">
-                      {{ block.settings.panel_5_text }}
-                    </div>
-                  {% endif %}
-
-                  {% comment %} ACCORDION 6 {% endcomment %}
-                  {% if block.settings.accordion_6_text != blank %}
-                    <button class="bl-accordion" style="color: {{ block.settings.accordion_color }};">{{ block.settings.accordion_6_text }}</button>
-                  {% endif %}
-
-                  {% if block.settings.panel_6_text != blank %}
-                    <div class="bl-panel" style="color: {{ block.settings.panel_color }};">
-                      {{ block.settings.panel_6_text }}
-                    </div>
-                  {% endif %}
+                  </div>
                 </div>
               </div>
 
@@ -2207,6 +2390,14 @@
               {
                 "value": "bl-btn-secondary",
                 "label": "Secondary Button"
+              },
+              {
+                "value": "bl-link-primary",
+                "label": "Primary Link"
+              },
+              {
+                "value": "bl-link-secondary",
+                "label": "Secondary Link"
               }
             ]
           }, 
@@ -2499,30 +2690,6 @@
         "type": "accordion",
         "name": "Accordion",
         "settings": [
-            {
-                "type": "header",
-                "content": "BLOCK DISPLAY SETTINGS"
-              }, 
-              {
-                "type": "select",
-                "id": "display_options",
-                "label": "Block display settings",
-                "default": "bl-hide-none",
-                "options": [
-                  {
-                    "value": "bl-hide-none",
-                    "label": "Display everywhere"
-                  }, 
-                  {
-                    "value": "bl-hide-desktop",
-                    "label": "Hide on desktop"
-                  }, 
-                  {
-                    "value": "bl-hide-mobile",
-                    "label": "Hide on mobile"
-                  }
-                ]
-              },
           {
             "type": "header",
             "content": "BLOCK STYLE"
@@ -3022,6 +3189,30 @@
             "step": 5,
             "label": "Block background image overlay opacity",
             "default": 60
+          },
+          {
+            "type": "header",
+            "content": "BLOCK DISPLAY SETTINGS"
+          }, 
+          {
+            "type": "select",
+            "id": "display_options",
+            "label": "Block display settings",
+            "default": "bl-hide-none",
+            "options": [
+              {
+                "value": "bl-hide-none",
+                "label": "Display everywhere"
+              }, 
+              {
+                "value": "bl-hide-desktop",
+                "label": "Hide on desktop"
+              }, 
+              {
+                "value": "bl-hide-mobile",
+                "label": "Hide on mobile"
+              }
+            ]
           }
         ]
       },
