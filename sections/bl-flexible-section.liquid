@@ -309,7 +309,7 @@
   } */
 
     /* METAFIELD CHANGES */
-    .bl--block p {
+    /* .bl--block p {
     font-size: {% if shop.metafields.flexi.dtparagraph != blank %}{{ shop.metafields.flexi.dtparagraph }}{% else %}16{% endif %}px;
   }
 
@@ -365,7 +365,7 @@
     .bl--block h6 {
       font-size: {% if shop.metafields.flexi.mbheading6 != blank %}{{ shop.metafields.flexi.mbheading6 }}{% else %}14{% endif %}px;
     }
-  }
+  } */
 
 {%- endstyle -%}
 
@@ -390,7 +390,11 @@
                   assign column_image_overlay = block.settings.opacity | divided_by: 100.00
                   assign show_col_bg = block.settings.show_col_bg
                   assign blockid = block.id
+                  assign style_id = block.settings.styling_identification
                 -%}
+
+                {% assign json_data = shop.metafields.flexi.flexistyles.value %}
+                {% assign value = json_data.allstyles['{{ style_id }}'] %}
 
                 {%- style -%}
                 .bl--block-wrapper--{{ blockid }} {
@@ -401,22 +405,25 @@
                     padding: {{ block.settings.mb_column_padding }}px;
                   }
                 }
+
+                {{ json_data.allstyles[style_id].botResponse }}
+
                 {%- endstyle -%}
 
                 {% capture bg_img %}{% if block.settings.bg_image != blank %} background: linear-gradient(0deg, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}, {{ block.settings.overlay_color | color_modify: 'alpha', column_image_overlay }}), url('{{ block.settings.bg_image | img_url: '1024x' }}'); background-size: {{ block.settings.bg_image_size }}; background-repeat: no-repeat; background-position-x: {{ block.settings.image_alignment_x }}; background-position-y: {{ block.settings.image_alignment_y }}; {% endif %}{% endcapture %}
 
                 <div class="bl-text-container bl--block {{ block.settings.display_options }}" style="align-items: {{ block.settings.alignment }}; justify-content: {{ block.settings.justify_content }}; border-radius: {{ block.settings.border_radius }}px; background-color: {{ block.settings.bg_col_color }}; {% if show_col_bg == true %}{{ bg_img }}{% endif %}">
-                  <div class="bl--block-wrapper--{{ blockid }}" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
-                    {% if block.settings.subheading != blank %}
-                      <{{ block.settings.subheading_text }} class="bl-subheading bl-{{ block.settings.subheading_text }}" style="color: {{ block.settings.subheading_color }}; margin: 0px 0px {{ block.settings.subheading_space }}px 0px;">{{ block.settings.subheading }}</{{ block.settings.subheading_text }}>
+                  <div class="bl--block-wrapper--{{ blockid }} bl-ai-styles" style="text-align: {{ block.settings.text_align }}; border-style: solid; border-width: {{ block.settings.border_width }}px; border-radius: {{ block.settings.border_radius }}px; border-color: {{ block.settings.border_color }}; background-color: {{ block.settings.bg_color }}; {% if show_col_bg == false %}{{ bg_img }}{% endif %}">
+                    {% comment %} {% if block.settings.subheading != blank %}
+                      <h5 class="bl-subheading bl-{{ block.settings.subheading_text }}" style="color: {{ block.settings.subheading_color }}; margin: 0px 0px {{ block.settings.subheading_space }}px 0px;">{{ block.settings.subheading }}</h5>
                     {% endif %}
 
                     {% if block.settings.heading != blank %}
-                      <{{ block.settings.heading_text }} class="bl-heading" style="color: {{ block.settings.heading_color }}; margin: 0px 0px  {{ block.settings.heading_space }}px 0px;">{{ block.settings.heading }}</{{ block.settings.heading_text }}>
+                      <h2 class="bl-heading" style="color: {{ block.settings.heading_color }}; margin: 0px 0px  {{ block.settings.heading_space }}px 0px;">{{ block.settings.heading }}</h2>
                     {% endif %}
 
                     {% if block.settings.description != blank %}
-                      <div class="bl-description" style="color: {{ block.settings.description_color }};  margin: 0px 0px {{ block.settings.description_space }}px 0px; max-width: {{ block.settings.description_max_width }}px;">{{ block.settings.description }}</div>
+                      <p class="bl-description" style="color: {{ block.settings.description_color }};  margin: 0px 0px {{ block.settings.description_space }}px 0px; max-width: {{ block.settings.description_max_width }}px;">{{ block.settings.description }}<p>
                     {% endif %}
 
                     {% if block.settings.btn_text != blank %}
@@ -425,7 +432,16 @@
 
                     {% if block.settings.under_text != blank %}
                       <{{ block.settings.under_text }} class="bl-under-text" style="color: {{ block.settings.under_text_color }};  margin: 0px;">{{ block.settings.under }}</{{ block.settings.under_text }}>
-                    {% endif %}
+                    {% endif %} {% endcomment %}
+
+                    <div className="bl-ai-styles">
+                      <h4 class="bl-subheading">{{ block.settings.subheading }}</h4>
+                      <h2 class="bl-heading">{{ block.settings.heading }}</h2>
+                      <p class="bl-description">
+                        {{ block.settings.description }}
+                      </p>
+                    </div>
+
                   </div>
               </div>
 
@@ -2139,6 +2155,11 @@
         "type": "text",
         "name": "Text",
         "settings": [
+          {
+            "type": "text",
+            "id": "styling_identification",
+            "label": "Styling Identification"
+          },
           {
             "type": "header",
             "content": "Alignment & Positioning"
