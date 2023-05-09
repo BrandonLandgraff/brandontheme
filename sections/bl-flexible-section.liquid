@@ -8,7 +8,24 @@
 
 {%- style -%}
 
-/* STYLES START */
+/* SECTION STYLES */
+  #bl-flexi-column-section--{{ sectionid }}{
+    {%- if bg_color != 'rgba(0,0,0,0)' and bg_color != '' -%}
+      background-color: {{ bg_color }};
+    {%- endif -%}
+  }
+
+  {% if section.settings.bg_image != blank %}
+    #bl-flexi-column-section--{{ sectionid }}{
+        min-height: 100%;
+        background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
+        background-size: {{ section.settings.bg_image_size }};
+        background-position-x: {{ section.settings.image_alignment_x }}; 
+        background-position-y: {{ section.settings.image_alignment_y }};
+        background-repeat: no-repeat;
+    }
+  {% endif %}
+
   .bl-blocks--{{ sectionid }} {
     display: grid;
     grid-template-columns: 1fr;
@@ -21,15 +38,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-    }
-
-    .bl-blocks--{{ sectionid }} {
-      width: 100%;
-    }
-
-    .bl-blocks-wrapper--{{ sectionid }} {
-      justify-content: center;
-      align-items: center;
+      margin: auto;
     }
 
     .bl-blocks--{{ sectionid }} {   
@@ -77,24 +86,6 @@
     }
   {% endif %}
 
-  /* BACKGROUND IMAGE */
-  #bl-flexi-column-section--{{ sectionid }}{
-    {%- if bg_color != 'rgba(0,0,0,0)' and bg_color != '' -%}
-      background-color: {{ bg_color }};
-    {%- endif -%}
-  }
-
-  {% if section.settings.bg_image != blank %}
-    #bl-flexi-column-section--{{ sectionid }}{
-        min-height: 100%;
-        background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
-        background-size: {{ section.settings.bg_image_size }};
-        background-position-x: {{ section.settings.image_alignment_x }}; 
-        background-position-y: {{ section.settings.image_alignment_y }};
-        background-repeat: no-repeat;
-    }
-  {% endif %}
-
   /* ADDITIONAL STYLES */
     @media only screen and (min-width: 768px) {
       .bl-hide-desktop {
@@ -107,40 +98,7 @@
       }
     }
 
-  .bl-m-auto {
-    margin: auto
-  }
-  
-  .bl-block {
-    display: block
-  }
-  
-  .bl-grid {
-    display: grid
-  }
-  
-  .bl-w-full {
-    width: 100%
-  }
-  
-  .bl-px-4 {
-    padding-left: 1rem;
-    padding-right: 1rem
-  }
-  
-  .bl-text-left {
-    text-align: left
-  }
-  
-  .bl-text-center {
-    text-align: center
-  }
-  
-  .bl-opacity-25 {
-    opacity: 0.25
-  }
-
-  /* DESKTOP SECTION HEIGHT */
+/* DESKTOP SECTION HEIGHT */
 @media only screen and (min-width: 768px){
     .height--150 {
       height: 150px;
@@ -238,8 +196,7 @@
 <section
   id="bl-flexi-column-section--{{ sectionid }}"
   class="bl-section-padding--{{ sectionid }} {{ section.settings.display_options }}">
-  <div class="bl-img-overlay">
-      <div style="max-width: {% if section.settings.full_width %}100%{% else %}{{ section.settings.width }}px;{% endif %}" class="bl-blocks-wrapper--{{ sectionid }} {{ section.settings.dt_height }} {{ section.settings.mb_height }} bl-m-auto">
+      <div class="bl-blocks-wrapper--{{ sectionid }} {{ section.settings.dt_height }} {{ section.settings.mb_height }}" style="max-width: {% if section.settings.full_width %}100%{% else %}{{ section.settings.width }}px;{% endif %}">
         <div class="bl-blocks--{{ sectionid }}">
 
           {% for block in section.blocks %}
@@ -255,7 +212,6 @@
 
         </div>
       </div>
-  </div>
 </section>
 
 {% schema %}
@@ -379,13 +335,17 @@
       },
       {
         "type": "header",
-        "content": "SECTION BACKGROUND IMAGE"
+        "content": "SECTION BACKGROUND COLOR"
       }, 
       {
         "type": "color",
         "id": "bg_color",
         "label": "Background color"
       },
+      {
+        "type": "header",
+        "content": "SECTION BACKGROUND IMAGE"
+      }, 
       {
         "type": "image_picker",
         "id": "bg_image",
