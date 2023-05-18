@@ -2,6 +2,7 @@
   "sections": {
     "image_banner": {
       "type": "image-banner",
+      "disabled": true,
       "blocks": {
         "heading": {
           "type": "heading",
@@ -50,6 +51,7 @@
     },
     "rich_text": {
       "type": "rich-text",
+      "disabled": true,
       "blocks": {
         "heading": {
           "type": "heading",
@@ -80,6 +82,7 @@
     },
     "featured_collection": {
       "type": "featured-collection",
+      "disabled": true,
       "settings": {
         "title": "Featured products",
         "heading_size": "h2",
@@ -107,6 +110,7 @@
     },
     "collage": {
       "type": "collage",
+      "disabled": true,
       "blocks": {
         "collection-0": {
           "type": "collection",
@@ -139,6 +143,7 @@
     },
     "video": {
       "type": "video",
+      "disabled": true,
       "settings": {
         "heading": "",
         "heading_size": "h1",
@@ -152,6 +157,7 @@
     },
     "multicolumn": {
       "type": "multicolumn",
+      "disabled": true,
       "blocks": {
         "column1": {
           "type": "column",
@@ -205,6 +211,7 @@
     },
     "166775836965eef3f4": {
       "type": "apps",
+      "disabled": true,
       "settings": {
         "include_margins": true
       }
@@ -218,6 +225,7 @@
     },
     "276104e9-67b6-460e-9c70-fd4d0ca84d8b": {
       "type": "ultimate-testimonial",
+      "disabled": true,
       "blocks": {
         "template--16840723792159__276104e9-67b6-460e-9c70-fd4d0ca84d8b-16678767266b4d518e-0": {
           "type": "title",
@@ -288,12 +296,14 @@
     },
     "16678829080445547e": {
       "type": "apps",
+      "disabled": true,
       "blocks": {
         "01af8186-4e72-4bb0-b839-d6c43cee7497": {
           "type": "shopify:\/\/apps\/xo-gallery\/blocks\/xo-gallery\/e61dfbaa-1a75-4e4e-bffc-324f17325251",
           "settings": {
             "type": "gallery",
-            "id": 1
+            "id": 1,
+            "mid": ""
           }
         }
       },
@@ -306,12 +316,14 @@
     },
     "1667883066138cb513": {
       "type": "apps",
+      "disabled": true,
       "settings": {
         "include_margins": true
       }
     },
     "8b8ebe62-cd02-4d8e-b20d-ed3490d85540": {
       "type": "ultimate-testimonial",
+      "disabled": true,
       "blocks": {
         "template--16840723792159__8b8ebe62-cd02-4d8e-b20d-ed3490d85540-16678767266b4d518e-0": {
           "type": "title",
@@ -382,6 +394,7 @@
     },
     "e914b823-0ad4-4c1a-92f3-9272ced0ae95": {
       "type": "multicolumn",
+      "disabled": true,
       "blocks": {
         "template--16840723792159__e914b823-0ad4-4c1a-92f3-9272ced0ae95-1671428052f5bd48a8-0": {
           "type": "column",
@@ -458,12 +471,14 @@
     },
     "1671428119d2fdfe4b": {
       "type": "apps",
+      "disabled": true,
       "blocks": {
         "d8196293-ef19-48b9-8b6d-dbe1ddf3e39c": {
           "type": "shopify:\/\/apps\/xo-gallery\/blocks\/xo-gallery\/e61dfbaa-1a75-4e4e-bffc-324f17325251",
           "settings": {
             "type": "album",
-            "id": 1
+            "id": 1,
+            "mid": ""
           }
         }
       },
@@ -476,6 +491,7 @@
     },
     "1675658998dbae0f1a": {
       "type": "apps",
+      "disabled": true,
       "blocks": {
         "55fea393-c11b-452f-bed4-6f066ac8d983": {
           "type": "shopify:\/\/apps\/theme-blocks-plus-by-sktch-io\/blocks\/page-pop-button\/4959f958-a614-4d73-add9-fc38222c9217",
@@ -485,7 +501,7 @@
             "buttonText": "Size Chart",
             "buttonFont": "abel_n4",
             "buttonColor": "#000000",
-            "buttonTextColor": "#FFFFFF",
+            "buttonTextColor": "#ffffff",
             "buttonVerticalPadding": 4,
             "buttonHorizontalPadding": 10,
             "buttonRadius": 3,
