@@ -1,0 +1,565 @@
+<!-- /sections/flexi-multicolumn-section.liquid -->
+{{ 'flexi-styling.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign sectionid = section.id
+  assign bg_color = section.settings.bg_color
+  assign bg_overlay = section.settings.opacity | divided_by: 100.00
+-%}
+
+{%- style -%}
+
+/* SECTION STYLES */
+  {% if section.settings.bg_image != blank %}
+    .flexi-multicolumn-section--{{ sectionid }} {
+        min-height: 100%;
+        background: linear-gradient(0deg, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}, {{ section.settings.overlay_color | color_modify: 'alpha', bg_overlay }}), url('{{ section.settings.bg_image | img_url: '2048x' }}');
+        background-size: {{ section.settings.bg_image_size }};
+        background-position-x: {{ section.settings.image_alignment_x }}; 
+        background-position-y: {{ section.settings.image_alignment_y }};
+        background-repeat: no-repeat;
+    }
+  {% endif %}
+
+  .flexi-blocks--{{ sectionid }} {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-content: center;
+    gap: {{ section.settings.gap }}px;
+  }
+
+  @media only screen and (min-width: 768px) {
+    .flexi-blocks-wrapper--{{ sectionid }} {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: auto;
+    }
+
+    .flexi-blocks--{{ sectionid }} {   
+      grid-template-columns: {{ section.settings.grid_layout }};
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  /* SECTION PADDING */
+  .flexi-multicolumn-section--{{ sectionid }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+      padding-left: {{ section.settings.padding_left }}px;
+      padding-right: {{ section.settings.padding_right }}px;
+  }
+
+  @media only screen and (max-width: 768px) {
+    .flexi-multicolumn-section--{{ sectionid }} {
+      padding-top: {{ section.settings.mb_padding_top }}px;
+      padding-bottom: {{ section.settings.mb_padding_bottom }}px;
+      padding-left: {{ section.settings.mb_padding_left }}px;
+      padding-right: {{ section.settings.mb_padding_right }}px;
+    }
+  }
+
+  /* COLUMN ORDER */
+  {% if section.settings.reverse_order %}
+    @media only screen and ( max-width: 768px ) {  
+      .flexi-blocks--{{ sectionid }} div:nth-child(1) {
+        order: 4;
+      }
+
+      .flexi-blocks--{{ sectionid }} div:nth-child(2) {
+        order: 3;
+      }
+
+      .flexi-blocks--{{ sectionid }} div:nth-child(3) {
+        order: 2;
+      }
+
+      .flexi-blocks--{{ sectionid }} div:nth-child(4) {
+        order: 1;
+      }
+    }
+{% endif %}
+
+{%- endstyle -%}
+
+<section
+  id="flexi-multicolumn-section"
+  class="flexi-multicolumn-section--{{ sectionid }} {{ section.settings.display_options }}"
+  style="background-color: {{ block.settings.bg_color }};">
+      <div class="flexi-blocks-wrapper--{{ sectionid }} {{ section.settings.dt_height }} {{ section.settings.mb_height }}" style="max-width: {% if section.settings.full_width %}100%{% else %}{{ section.settings.width }}px;{% endif %}">
+        <div class="flexi-blocks--{{ sectionid }}">
+
+          {% for block in section.blocks %}
+            {% case block.type %}
+
+              {% when '@app' %}
+                <div class="flexi--app-block--{{ block.id }}">
+                    {% render block %}
+                </div>
+                  
+            {% endcase %}
+          {% endfor %}
+
+        </div>
+      </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Flexi Multicolumn",
+    "class": "starter",
+    "settings": [
+      {
+        "type": "header",
+        "content": "COLUMN SETTINGS"
+      },
+      {
+        "type": "select",
+        "id": "grid_layout",
+        "label": "CHOOSE LAYOUT",
+        "options": [
+          {
+            "group": "One Column",
+            "value": "1fr",
+            "label": "███████████"
+          },
+          {
+            "group": "Two Column",
+            "value": "1fr 1fr",
+            "label": "█████    █████"
+          },
+          {
+            "group": "Two Column",
+            "value": "40% 60%",
+            "label": "████    ██████"
+          },
+          {
+            "group": "Two Column",
+            "value": "30% 70%",
+            "label": "███    ███████"
+          },
+          {
+            "group": "Two Column",
+            "value": "20% 80%",
+            "label": "██    ████████"
+          },
+          {
+            "group": "Two Column",
+            "value": "10% 90%",
+            "label": "█    █████████"
+          },
+          {
+            "group": "Two Column",
+            "value": "60% 40%",
+            "label": "██████    ████"
+          },
+          {
+            "group": "Two Column",
+            "value": "70% 30%",
+            "label": "███████    ███"
+          },
+          {
+            "group": "Two Column",
+            "value": "80% 20%",
+            "label": "████████    ██"
+          },
+          {
+            "group": "Two Column",
+            "value": "90% 10%",
+            "label": "█████████    █"
+          },
+          {
+            "group": "Three Column",
+            "value": "1fr 1fr 1fr",
+            "label": "███    ███    ███"
+          },
+          {
+            "group": "Three Column",
+            "value": "20% 60% 20%",
+            "label": "██    █████    ██"
+          },
+          {
+            "group": "Three Column",
+            "value": "10% 60% 30%",
+            "label": "█    █████    ███"
+          },
+          {
+            "group": "Three Column",
+            "value": "30% 60% 10%",
+            "label": "███    █████    █"
+          },
+          {
+            "group": "Four Column",
+            "value": "1fr 1fr 1fr 1fr",
+            "label": "██    ██    ██    ██"
+          }
+        ],
+        "default": "1fr 1fr"
+      },
+      {
+        "type": "range",
+        "id": "gap",
+        "min": 0,
+        "max": 144,
+        "step": 2,
+        "unit": "px",
+        "label": "Space between columns",
+        "default": 12
+      }, 
+      {
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Force full width",
+        "default": false,
+        "info": "Override the max width setting below."
+      },
+      {
+        "type": "range",
+        "id": "width",
+        "min": 320,
+        "max": 1440,
+        "step": 20,
+        "unit": "px",
+        "label": "Max container width",
+        "default": 1200
+      },
+      {
+        "type": "header",
+        "content": "SECTION BACKGROUND COLOR"
+      }, 
+      {
+        "type": "color",
+        "id": "bg_color",
+        "label": "Background color"
+      },
+      {
+        "type": "header",
+        "content": "SECTION BACKGROUND IMAGE"
+      }, 
+      {
+        "type": "image_picker",
+        "id": "bg_image",
+        "label": "Background image"
+      }, 
+      {
+        "type": "select",
+        "id": "bg_image_size",
+        "label": "Background image size",
+        "default": "cover",
+        "options": [
+          {
+            "value": "contain",
+            "label": "Contain"
+          }, 
+          {
+            "value": "cover",
+            "label": "Cover"
+          }
+        ]
+      }, 
+      {
+        "type": "select",
+        "id": "image_alignment_x",
+        "label": "Background image horizontal alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "left",
+            "label": "Left"
+          }, 
+          {
+            "value": "center",
+            "label": "Center"
+          }, 
+          {
+            "value": "right",
+            "label": "Right"
+          }
+        ]
+      }, 
+      {
+        "type": "select",
+        "id": "image_alignment_y",
+        "label": "Background image vertical alignment",
+        "default": "center",
+        "options": [
+          {
+            "value": "top",
+            "label": "Top"
+          }, 
+          {
+            "value": "center",
+            "label": "Center"
+          }, 
+          {
+            "value": "bottom",
+            "label": "Bottom"
+          }
+        ]
+      }, 
+      {
+        "type": "header",
+        "content": "SECTION BACKGROUND IMAGE OVERLAY"
+      }, 
+      {
+        "type": "color",
+        "id": "overlay_color",
+        "label": "Background image overlay color",
+        "default": "#000000"
+      },
+      {
+        "type": "range",
+        "id": "opacity",
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "label": "Background image overlay opacity",
+        "default": 60
+      }, 
+      {
+        "type": "header",
+        "content": "SECTION HEIGHT"
+      },
+      {
+        "type": "select",
+        "id": "dt_height",
+        "label": "Section desktop height",
+        "default": "height--none",
+        "options": [
+          {
+            "value": "height--none",
+            "label": "No fixed height"
+          },
+          {
+            "value": "height--full",
+            "label": "Full screen height"
+          },
+          {
+            "value": "height--150",
+            "label": "150px"
+          }, 
+          {
+            "value": "height--250",
+            "label": "250px"
+          }, 
+          {
+            "value": "height--350",
+            "label": "350px"
+          }, 
+          {
+            "value": "height--450",
+            "label": "450px"
+          }, 
+          {
+            "value": "height--550",
+            "label": "550px"
+          }, 
+          {
+            "value": "height--650",
+            "label": "650px"
+          },
+          {
+            "value": "height--1-3",
+            "label": "1/3 of screen"
+          },
+          {
+            "value": "height--1-2",
+            "label": "1/2 of screen"
+          },
+          {
+            "value": "height--2-3",
+            "label": "2/3 of screen"
+          },
+          {
+            "value": "height--3-4",
+            "label": "3/4 of screen"
+          }
+        ]
+      }, 
+      {
+        "type": "select",
+        "id": "mb_height",
+        "label": "Section mobile height",
+        "default": "mb-height--none",
+        "options": [
+          {
+            "value": "mb-height--none",
+            "label": "No fixed height"
+          },
+          {
+            "value": "mb-height--full",
+            "label": "Full screen height"
+          },
+          {
+            "value": "mb-height--150",
+            "label": "150px"
+          }, 
+          {
+            "value": "mb-height--250",
+            "label": "250px"
+          }, 
+          {
+            "value": "mb-height--350",
+            "label": "350px"
+          }, 
+          {
+            "value": "mb-height--450",
+            "label": "450px"
+          }, 
+          {
+            "value": "mb-height--550",
+            "label": "550px"
+          }, 
+          {
+            "value": "mb-height--650",
+            "label": "650px"
+          },
+          {
+            "value": "mb-height--1-3",
+            "label": "1/3 of screen"
+          },
+          {
+            "value": "mb-height--1-2",
+            "label": "1/2 of screen"
+          },
+          {
+            "value": "mb-height--2-3",
+            "label": "2/3 of screen"
+          },
+          {
+            "value": "mb-height--3-4",
+            "label": "3/4 of screen"
+          }
+        ]
+      }, 
+      {
+        "type": "header",
+        "content": "DESKTOP SECTION PADDING"
+      }, 
+      {
+        "type": "range",
+        "id": "padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Desktop padding top",
+        "default": 60
+      }, 
+      {
+        "type": "range",
+        "id": "padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Desktop padding bottom",
+        "default": 60
+      }, {
+        "type": "range",
+        "id": "padding_left",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Desktop padding left",
+        "default": 24
+      }, {
+        "type": "range",
+        "id": "padding_right",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Desktop padding right",
+        "default": 24
+      }, 
+      {
+        "type": "header",
+        "content": "MOBILE SECTION PADDING"
+      },
+      {
+        "type": "range",
+        "id": "mb_padding_top",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Mobile padding top",
+        "default": 60
+      }, 
+      {
+        "type": "range",
+        "id": "mb_padding_bottom",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Mobile padding bottom",
+        "default": 60
+      }, {
+        "type": "range",
+        "id": "mb_padding_left",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Mobile padding left",
+        "default": 12
+      }, {
+        "type": "range",
+        "id": "mb_padding_right",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "px",
+        "label": "Mobile padding right",
+        "default": 12
+      },
+      {
+          "type": "header",
+          "content": "SECTION DISPLAY SETTINGS"
+      }, 
+      {
+        "type": "checkbox",
+        "id": "reverse_order",
+        "label": "Reverse Mobile Block Order",
+        "default": false
+      },
+      {
+          "type": "select",
+          "id": "display_options",
+          "label": "Section display settings",
+          "default": "flexi-hide-none",
+          "options": [
+              {
+              "value": "flexi-hide-none",
+              "label": "Display everywhere"
+              }, 
+              {
+              "value": "flexi-hide-desktop",
+              "label": "Hide on desktop"
+              }, 
+              {
+              "value": "flexi-hide-mobile",
+              "label": "Hide on mobile"
+              }
+          ]
+      }
+    ],
+    "max_blocks": 4,
+    "blocks": [
+      {
+        "type": "@app"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Flexi Multicolumn",
+        "category": "Text",
+        "blocks": []
+      }
+    ]
+  }
+{% endschema %}
